@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YOUR'S E-BOOK | Premium Cinematic 3D Digital Library</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0a0407;
+      --bg-maroon: #15060d;
+      --bg-burgundy: #260a15;
+      --accent-gold: #e5b364;
+      --accent-copper: #c86d51;
+      --border-subtle: rgba(229, 179, 100, 0.16);
+      --font-cinzel: 'Cinzel', serif;
+      --font-cormorant: 'Cormorant Garamond', serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #f1eae2;
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #3d1421; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+
+    /* 3D Bookshelf Viewport */
+    .shelf-container {
+      perspective: 1600px;
+      user-select: none;
+    }
+
+    .shelf-stage {
+      transform-style: preserve-3d;
+      scrollbar-width: none;
+    }
+    .shelf-stage::-webkit-scrollbar { display: none; }
+
+    /* Wood Shelf Beam */
+    .wood-shelf {
+      background: linear-gradient(180deg, #3d1b13 0%, #200d09 60%, #0d0503 100%);
+      border-top: 2px solid #632f22;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.9);
+    }
+    .wood-shelf::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: rgba(0, 0, 0, 0.45);
+      filter: blur(4px);
+    }
+
+    /* 3D Book Anatomy */
+    .book-item {
+      position: relative;
+      width: 52px;
+      height: 310px;
+      transform-style: preserve-3d;
+      cursor: pointer;
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), margin 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      flex-shrink: 0;
+    }
+
+    .book-spine {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 52px;
+      height: 310px;
+      border-radius: 3px 0 0 3px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 6px;
+      box-shadow: inset -4px 0 10px rgba(0,0,0,0.5), inset 3px 0 6px rgba(255,255,255,0.1), 0 10px 25px rgba(0,0,0,0.7);
+      border-right: 1px solid rgba(0,0,0,0.4);
+      backface-visibility: hidden;
+      transform: translateZ(0);
+      overflow: hidden;
+    }
+
+    .spine-title {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      font-family: var(--font-cinzel);
+      font-size: 13px;
+      letter-spacing: 2px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 190px;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    }
+
+    .book-front {
+      position: absolute;
+      top: 0;
+      left: 52px;
+      width: 215px;
+      height: 310px;
+      transform-origin: left center;
+      transform: rotateY(90deg);
+      background-size: cover;
+      background-position: center;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 15px 15px 35px rgba(0,0,0,0.85);
+      backface-visibility: visible;
+      overflow: hidden;
+    }
+
+    .book-front-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.88) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 18px;
+    }
+
+    .book-item:not(.selected):hover {
+      transform: translateY(-16px) translateZ(20px);
+    }
+
+    .book-item.selected {
+      transform: translateZ(160px) translateY(-26px);
+      margin-right: 235px;
+      z-index: 30;
+    }
+
+    .book-item.selected .book-front {
+      transform: rotateY(0deg);
+      left: 0;
+      border-radius: 4px;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.9), 0 0 35px rgba(229, 179, 100, 0.3);
+    }
+
+    .book-item.selected .book-spine {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Modal Transitions */
+    .app-modal {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .app-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER WITH PERFECTLY CENTERED FLOATING PILL NAVIGATION -->
+  <header class="fixed top-0 left-0 w-full h-[76px] px-6 sm:px-12 flex items-center justify-between bg-[#0a0407]/85 backdrop-blur-md border-b border-[#e5b364]/15 z-50">
+    <!-- Brand Logo -->
+    <div class="flex items-center gap-3 cursor-pointer select-none" id="brandLogo" title="Triple-click for Curator Portal">
+      <i class="fa-solid fa-book-atlas text-xl text-[#e5b364] drop-shadow-[0_0_10px_rgba(229,179,100,0.4)]"></i>
+      <span class="font-['Cinzel'] text-lg sm:text-xl font-bold tracking-[3px] text-white uppercase">YOUR'S E-BOOK</span>
+    </div>
+
+    <!-- Centered Floating Pill Navigation Bar -->
+    <div class="hidden md:flex items-center gap-7 px-7 py-2 rounded-full bg-[#200812]/80 border border-[#e5b364]/25 shadow-lg backdrop-blur-lg absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+      <a href="#hero" class="text-xs font-semibold tracking-[2px] text-[#cfbebe] hover:text-[#e5b364] transition">GALLERY</a>
+      <a href="#shelfSection" class="text-xs font-semibold tracking-[2px] text-[#cfbebe] hover:text-[#e5b364] transition">TALENTS</a>
+      <a href="#shelfSection" class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#9c4c36] to-[#c86d51] flex items-center justify-center text-white shadow-md hover:scale-110 transition" title="Go to 3D Shelf">
+        <i class="fa-solid fa-book-open text-xs"></i>
+      </a>
+      <a href="#archiveSection" class="text-xs font-semibold tracking-[2px] text-[#cfbebe] hover:text-[#e5b364] transition">JOURNAL</a>
+      <a href="#archiveSection" class="text-xs font-semibold tracking-[2px] text-[#cfbebe] hover:text-[#e5b364] transition">STORY</a>
+    </div>
+
+    <!-- Right Search Action -->
+    <div class="flex items-center gap-4">
+      <button class="w-10 h-10 rounded-full border border-[#e5b364]/20 flex items-center justify-center text-[#e5b364] hover:bg-[#e5b364]/10 transition" id="searchTrigger" title="Search Books">
+        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- CINEMATIC HERO SECTION (REALISTIC AVIAN FLIGHT SIMULATION) -->
+  <section class="relative w-full h-screen min-h-[640px] flex items-center justify-center text-center overflow-hidden px-4" id="hero">
+    <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-0"></canvas>
+    <div class="absolute inset-0 bg-radial-at-center from-[#260a15]/20 via-[#0a0407]/70 to-[#0a0407] z-10 pointer-events-none"></div>
+
+    <div class="relative z-20 max-w-4xl px-4 mt-12 animate-fade-in">
+      <h1 class="font-['Cinzel'] text-4xl sm:text-6xl md:text-7xl font-black tracking-[6px] text-white drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)] uppercase mb-3">
+        YOUR'S E-BOOK
+      </h1>
+      <p class="font-['Cormorant_Garamond'] text-xl sm:text-2xl italic text-[#e5b364] tracking-[3px] mb-5">
+        "A WORLD OF STORIES, KNOWLEDGE & IMAGINATION"
+      </p>
+      <p class="text-sm sm:text-base text-[#ded5cc] max-w-xl mx-auto leading-relaxed mb-8 opacity-90">
+        Discover extraordinary books, explore native and world literatures, and experience physical hardcover reading preserved in digital reality.
+      </p>
+
+      <div class="flex items-center justify-center gap-5">
+        <a href="#shelfSection" class="px-8 py-3.5 bg-gradient-to-r from-[#e5b364] to-[#b88636] text-[#0a0407] font-bold text-xs tracking-[2px] uppercase rounded shadow-lg hover:shadow-[#e5b364]/40 hover:-translate-y-0.5 transition">
+          EXPLORE BOOKS
+        </a>
+        <a href="#archiveSection" class="px-8 py-3.5 border border-[#e5b364]/30 text-[#f1eae2] font-semibold text-xs tracking-[2px] uppercase rounded hover:border-[#e5b364] hover:text-[#e5b364] hover:bg-[#e5b364]/10 transition">
+          DISCOVER MORE
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. 3D BOOKSHELF SECTION (DIRECTLY BELOW HERO) -->
+  <section class="relative py-20 px-4 sm:px-8 bg-gradient-to-b from-[#0a0407] via-[#15060d] to-[#0a0407] flex flex-col items-center border-t border-[#e5b364]/10" id="shelfSection">
+    <div class="text-center mb-8">
+      <span class="font-['Cormorant_Garamond'] text-lg text-[#e5b364] tracking-[3px] uppercase block mb-1">Physical 3D Shelf</span>
+      <h2 class="font-['Cinzel'] text-3xl sm:text-4xl text-white tracking-[4px] uppercase">Grand Library Shelf</h2>
+    </div>
+
+    <!-- Language & Category Filters -->
+    <div class="w-full max-w-5xl mb-10 flex flex-col items-center gap-3">
+      <div class="flex flex-wrap justify-center gap-2" id="shelfLangFilters">
+        <button class="pill-btn active px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-[#e5b364] bg-[#e5b364]/20 text-[#e5b364] transition" data-lang="all">All Languages</button>
+        <button class="pill-btn px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-white/10 text-stone-400 hover:text-white transition" data-lang="Bangla">Bangla</button>
+        <button class="pill-btn px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-white/10 text-stone-400 hover:text-white transition" data-lang="English">English</button>
+        <button class="pill-btn px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-white/10 text-stone-400 hover:text-white transition" data-lang="Hindi">Hindi</button>
+        <button class="pill-btn px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-white/10 text-stone-400 hover:text-white transition" data-lang="Other">Other</button>
+      </div>
+    </div>
+
+    <!-- 3D Shelf Stage -->
+    <div class="shelf-container relative w-full max-w-6xl h-[470px] flex flex-col justify-end items-center mb-6">
+      <button class="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#1b0a11]/90 border border-[#e5b364]/30 text-[#e5b364] flex items-center justify-center hover:bg-[#e5b364] hover:text-black transition z-30" id="shelfPrev">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#1b0a11]/90 border border-[#e5b364]/30 text-[#e5b364] flex items-center justify-center hover:bg-[#e5b364] hover:text-black transition z-30" id="shelfNext">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <div class="shelf-stage w-full h-[380px] flex items-end justify-center gap-4 pb-6 overflow-x-auto overflow-y-visible" id="shelfStage">
+        <!-- Rendered dynamically from Supabase Database -->
+      </div>
+
+      <div class="wood-shelf relative w-full h-7 rounded-sm"></div>
+    </div>
+
+    <!-- Active Book Meta Info Bar -->
+    <div class="text-center min-h-[50px]" id="selectedBookMeta">
+      <div class="font-['Cinzel'] text-xl text-[#f4d08a] tracking-wider mb-1">SELECT A BOOK TO INSPECT</div>
+      <div class="text-xs text-stone-400 tracking-widest uppercase">Click any spine to pull it from the shelf</div>
+    </div>
+  </section>
+
+  <!-- 2. ARCHIVE COLLECTIONS SECTION (BELOW 3D SHELF) -->
+  <section class="py-16 px-6 sm:px-12 bg-[#0d0509] border-t border-[#e5b364]/10" id="archiveSection">
+    <!-- Single-line Title and Filters -->
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+      <!-- Title on Single Line -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <span class="text-[10px] sm:text-xs font-bold tracking-[2.5px] text-[#e5b364] uppercase px-3 py-1 bg-[#e5b364]/10 border border-[#e5b364]/20 rounded">
+          CURATORIAL SELECTIONS
+        </span>
+        <span class="text-stone-500 hidden sm:inline">•</span>
+        <h2 class="font-['Cinzel'] text-xl sm:text-2xl font-bold tracking-[3px] text-white uppercase">
+          Archive Collections
+        </h2>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
+        <button class="archive-pill active px-4 py-2 rounded bg-[#70202e] text-white text-xs font-semibold tracking-wider uppercase border border-[#a83447] flex items-center gap-2 shadow" data-tab="all">
+          <i class="fa-solid fa-sparkles text-[10px]"></i> FEATURED VOLUMES
+        </button>
+        <button class="archive-pill px-4 py-2 rounded bg-black/40 text-stone-400 hover:text-white text-xs font-semibold tracking-wider uppercase border border-white/10 flex items-center gap-2" data-tab="popular">
+          <i class="fa-solid fa-chart-line text-[10px]"></i> MOST POPULAR
+        </button>
+        <button class="archive-pill px-4 py-2 rounded bg-black/40 text-stone-400 hover:text-white text-xs font-semibold tracking-wider uppercase border border-white/10 flex items-center gap-2" data-tab="recent">
+          <i class="fa-regular fa-clock text-[10px]"></i> RECENTLY ADDED
+        </button>
+        <button class="archive-pill px-4 py-2 rounded bg-black/40 text-stone-400 hover:text-white text-xs font-semibold tracking-wider uppercase border border-white/10 flex items-center gap-2" data-tab="picks">
+          <i class="fa-solid fa-bookmark text-[10px]"></i> EDITOR'S PICKS
+        </button>
+      </div>
+    </div>
+
+    <!-- Archive Book Grid -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7" id="archiveGrid">
+      <!-- Injected dynamically from Supabase Database -->
+    </div>
+  </section>
+
+  <!-- FULL-SCREEN BOOK DETAILS MODAL -->
+  <div class="app-modal fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] items-center justify-center p-4 sm:p-8" id="detailsModal">
+    <div class="relative w-full max-w-4xl bg-[#170a10] border border-[#e5b364]/20 rounded-lg shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+      <button class="absolute top-4 right-4 text-stone-400 hover:text-white text-xl z-20" id="closeDetailsBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Left Cover Pane -->
+      <div class="bg-[#0b0407] p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-[#e5b364]/10">
+        <img src="" alt="Book Cover" class="w-full max-w-[260px] h-[370px] object-cover rounded shadow-2xl border border-white/10" id="modalCoverImg">
+      </div>
+
+      <!-- Right Metadata Pane -->
+      <div class="p-8 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="px-2.5 py-1 bg-[#e5b364]/15 border border-[#e5b364]/30 text-[#e5b364] text-[10px] font-bold tracking-widest uppercase rounded" id="modalLang">LANGUAGE</span>
+            <span class="px-2.5 py-1 bg-white/5 border border-white/10 text-stone-300 text-[10px] font-bold tracking-widest uppercase rounded" id="modalCat">CATEGORY</span>
+          </div>
+
+          <h2 class="font-['Cinzel'] text-2xl sm:text-3xl font-bold text-white tracking-wide mb-1" id="modalTitle">Book Title</h2>
+          <p class="font-['Cormorant_Garamond'] text-lg italic text-[#e5b364] mb-4" id="modalAuthor">by Author</p>
+          <p class="text-xs sm:text-sm text-stone-300 leading-relaxed mb-6 max-h-32 overflow-y-auto" id="modalDesc">Description text goes here...</p>
+
+          <div class="grid grid-cols-2 gap-2 text-xs bg-black/40 p-3 rounded border border-white/5 mb-6">
+            <div><span class="text-stone-500">Year:</span> <span class="text-white" id="modalYear">2026</span></div>
+            <div><span class="text-stone-500">Rating:</span> <span class="text-[#e5b364]" id="modalRating">⭐ 4.9</span></div>
+            <div><span class="text-stone-500">Format:</span> <span class="text-white">Cloud Folio</span></div>
+            <div><span class="text-stone-500">Storage:</span> <span class="text-emerald-400">Supabase DB</span></div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button class="flex-1 py-3 bg-[#70202e] hover:bg-[#8a2638] text-white font-bold text-xs tracking-widest uppercase rounded shadow transition" id="modalReadBtn">
+            <i class="fa-solid fa-book-open mr-2"></i> READ NOW
+          </button>
+          <button class="px-5 py-3 border border-white/20 text-stone-300 hover:text-white hover:border-white text-xs font-semibold tracking-widest uppercase rounded transition" id="closeDetailsBtn2">
+            CLOSE
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISTRACTION-FREE DIGITAL READER -->
+  <div class="app-modal fixed inset-0 bg-[#120c0f] text-stone-200 z-[110] flex-col" id="readerModal">
+    <div class="h-14 bg-[#0a0508] border-b border-white/10 px-6 flex items-center justify-between">
+      <div class="font-['Cinzel'] text-sm tracking-wider text-[#e5b364]" id="readerTitle">Reading Title</div>
+      <div class="flex items-center gap-4">
+        <button class="px-3 py-1 border border-white/10 text-xs rounded hover:bg-white/5" id="fontDec">A-</button>
+        <button class="px-3 py-1 border border-white/10 text-xs rounded hover:bg-white/5" id="fontInc">A+</button>
+        <button class="text-stone-400 hover:text-white text-sm" id="closeReaderBtn">
+          <i class="fa-solid fa-xmark mr-1"></i> Close
+        </button>
+      </div>
+    </div>
+    <div class="flex-1 max-w-3xl w-full mx-auto p-8 overflow-y-auto font-['Cormorant_Garamond'] text-2xl leading-relaxed" id="readerBody">
+      <!-- Full Reading Content -->
+    </div>
+  </div>
+
+  <!-- SECRET OWNER CURATOR PORTAL (POST BOOKS DIRECT TO SUPABASE) -->
+  <div class="app-modal fixed inset-0 bg-black/90 backdrop-blur-xl z-[120] items-center justify-center p-4" id="adminModal">
+    <div class="w-full max-w-xl bg-[#170810] border border-[#e5b364] rounded-lg p-7 shadow-2xl relative">
+      <button class="absolute top-4 right-4 text-stone-400 hover:text-white" id="closeAdminBtn"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+      <!-- PIN Lock Screen -->
+      <div id="adminPinScreen">
+        <h3 class="font-['Cinzel'] text-xl text-[#e5b364] tracking-widest text-center uppercase mb-1">CURATOR ACCESS</h3>
+        <p class="text-xs text-stone-400 text-center mb-6">Enter Secret Master PIN to manage Cloud Database</p>
+        <input type="password" id="adminPinInput" placeholder="Master PIN (Default: 2026)" class="w-full bg-black/50 border border-[#e5b364]/30 rounded p-3 text-white text-sm mb-4 outline-none focus:border-[#e5b364]">
+        <button class="w-full py-3 bg-[#e5b364] text-black font-bold text-xs tracking-widest uppercase rounded hover:bg-[#f4d08a]" id="adminLoginBtn">UNLOCK PORTAL</button>
+      </div>
+
+      <!-- Cloud Upload Screen -->
+      <div id="adminPostScreen" class="hidden">
+        <h3 class="font-['Cinzel'] text-xl text-[#e5b364] tracking-widest text-center uppercase mb-1">PUBLISH TO CLOUD</h3>
+        <p class="text-xs text-stone-400 text-center mb-5">Books will instantly show on everyone's device via Supabase</p>
+
+        <form id="addBookForm" class="space-y-3.5 max-h-[70vh] overflow-y-auto pr-1">
+          <div>
+            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Book Title *</label>
+            <input type="text" id="postTitle" required placeholder="e.g. পথের পাঁচালী / The Silent Horizon" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Native Script Subtitle</label>
+              <input type="text" id="postNativeTitle" placeholder="e.g. নীরব সীমানা" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Author Name *</label>
+              <input type="text" id="postAuthor" required placeholder="e.g. Arnab Mukherjee" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Language</label>
+              <select id="postLang" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
+                <option value="Bangla">Bangla</option>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Category</label>
+              <select id="postCat" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
+                <option value="Fiction">Fiction</option>
+                <option value="Romance">Romance</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Adventure">Adventure</option>
+                <option value="History">History</option>
+                <option value="Poetry">Poetry</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Year</label>
+              <input type="number" id="postYear" value="2026" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Spine Color</label>
+              <input type="color" id="postSpineColor" value="#3a131f" class="w-full h-9 bg-black/40 border border-white/15 rounded p-1">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Rating</label>
+              <input type="text" id="postRating" value="4.9" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
+            </div>
+          </div>
+
+          <!-- Cover Image Upload or URL -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Cover Art (Direct Upload or Link)</label>
+            <input type="file" id="coverFileInput" accept="image/*" class="hidden">
+            <div class="p-3 border border-dashed border-[#e5b364]/40 rounded text-center cursor-pointer hover:border-[#e5b364] transition bg-black/30" id="filePickerBtn">
+              <i class="fa-solid fa-cloud-arrow-up text-[#e5b364] mb-1"></i>
+              <div class="text-xs text-stone-300" id="fileUploadStatus">Click to select photo from your device</div>
+            </div>
+            <input type="text" id="postCoverUrl" placeholder="Or paste image URL (ImgBB / Unsplash)" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white mt-2 outline-none focus:border-[#e5b364]">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Short Description / Synopsis</label>
+            <textarea id="postDesc" rows="2" placeholder="Brief book description..." class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Book Reading Text</label>
+            <textarea id="postContent" rows="4" placeholder="Paste full chapter / reader text here..." class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-gradient-to-r from-[#e5b364] to-[#b88636] text-black font-bold text-xs tracking-widest uppercase rounded shadow hover:shadow-[#e5b364]/40 transition" id="submitBookBtn">
+            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXACT SINGLE-LINE FOOTER -->
+  <footer class="bg-[#050204] border-t border-[#e5b364]/10 py-6 px-6 sm:px-12 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-3 text-[11px] sm:text-xs text-stone-400">
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="about">About Us</a>
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="contact">Contact Us</a>
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="privacy">Privacy Policy</a>
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="terms">Terms and Conditions</a>
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="disclaimer">Disclaimer</a>
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="copyright">Copyright Policy</a>
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="dmca">DMCA / Copyright Removal</a>
+        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="sitemap">Sitemap</a>
+      </div>
+      <div class="tracking-wider uppercase text-stone-500 text-[10px] sm:text-xs">
+        © 2026 YOUR'S E-BOOK. ALL RIGHTS RESERVED.
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT & SUPABASE CLOUD LOGIC -->
+  <script>
+    /* ========================================================
+       1. SUPABASE CLOUD CONFIGURATION
+       Paste your credentials from Supabase Project Settings > API
+       ======================================================== */
+    const SUPABASE_URL = "https://rjfvzvbpiepatngotlfm.supabase.co"; // Example: https://xyz.supabase.co
+    const SUPABASE_ANON_KEY = "sb_publishable_OSBZZ7-fUj7ubTmrYp3IVQ_-ctSFLmv"; // Your anon public key
+    const MASTER_PIN = "9096";
+
+    let supabaseClient = null;
+    if (SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" && window.supabase) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    // Default Seed Books (Used until cloud records exist)
+    const initialSeedBooks = [
+      {
+        id: '1',
+        title: 'The Observer',
+        native_title: 'দ্য অবজারভার',
+        author: 'Elias Blackwood',
+        language: 'English',
+        category: 'Mystery',
+        year: '1968',
+        rating: 4.8,
+        spine_color: '#2b1b17',
+        cover_image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80',
+        description: 'Set against the fog-shrouded alleys of late 1960s London and Zurich, a reclusive cartographer stumbles upon an encoded atlas revealing secret covert pathways.',
+        content: 'Chapter 1: The Fog of London\n\nThe rain in Bloomsbury had turned the cobbles into black glass. Elias sat by the tallow flame, unrolling the calfskin parchment...'
+      },
+      {
+        id: '2',
+        title: 'Light in the Storm',
+        native_title: 'ঝড়ের আলো',
+        author: 'Eliza Jane Reed',
+        language: 'English',
+        category: 'Adventure',
+        year: '1978',
+        rating: 4.9,
+        spine_color: '#1a2930',
+        cover_image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=700&q=80',
+        description: 'A solitary lighthouse keeper and his young apprentice endure an unrelenting three-day gale that alters their perception of solitude and loyalty.',
+        content: 'Chapter 1: The Lantern Room\n\nThe Fresnel lens spun slowly on its mercury bath, casting radiant blades of light into the abyss of the North Atlantic...'
+      },
+      {
+        id: '3',
+        title: 'The Silent Horizon',
+        native_title: 'নীরব সীমানা',
+        author: 'Arnab Mukherjee',
+        language: 'Bangla',
+        category: 'Fiction',
+        year: '1982',
+        rating: 4.9,
+        spine_color: '#3a131f',
+        cover_image: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=700&q=80',
+        description: 'একটি নদীর তীরে বেড়ে ওঠা তিন প্রজন্মের জীবন, ভালোবাসা ও বেদনার অনুপম মহাকাব্য। পদ্মা ও রূপসার পলির গন্ধ জড়িয়ে থাকা এক অমর উপাখ্যান।',
+        content: 'প্রথম পরিচ্ছেদ: নদীর গন্ধ\n\nভোরের কুয়াশা যখন রূপসার জলের ওপর আলতো চাদরের মতো বিছিয়ে থাকে, তখন মাঝিরা নৌকার গলুইয়ে বসে তামাকের ধোঁয়া ছাড়ে...'
+      },
+      {
+        id: '4',
+        title: 'Wings of Fire',
+        native_title: 'अग्नि पंख',
+        author: 'Devendra Sharma',
+        language: 'Hindi',
+        category: 'History',
+        year: '1975',
+        rating: 4.9,
+        spine_color: '#421f15',
+        cover_image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=700&q=80',
+        description: 'प्राचीन भारत के गौरवशाली राजप्रासादों और संतों की दिव्य ज्ञान-परंपरा की ऐतिहासिक यात्रा, जो मनुष्य की असीम शक्ति को उजागर करती है।',
+        content: 'अध्याय १: सूर्योदय की बेला\n\nकाशी के घाटों पर गूँजते वेद मंत्रों के बीच एक संन्यासी ने अपनी यात्रा का अंतिम संकल्प लिया...'
+      }
+    ];
+
+    let currentBooks = [];
+    let selectedBookId = null;
+    let shelfLangFilter = 'all';
+
+    /* ========================================================
+       2. DATABASE DATA FETCHING
+       ======================================================== */
+    async function loadBooks() {
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('books')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (!error && data && data.length > 0) {
+            currentBooks = data;
+          } else {
+            currentBooks = initialSeedBooks;
+          }
+        } catch (err) {
+          console.warn("Using local seed:", err);
+          currentBooks = initialSeedBooks;
+        }
+      } else {
+        // Fallback to local storage if Supabase credentials are not set yet
+        const local = localStorage.getItem('yours_ebook_local_shelf');
+        currentBooks = local ? JSON.parse(local) : initialSeedBooks;
+      }
+
+      render3DShelf();
+      renderArchiveGrid();
+    }
+
+    /* ========================================================
+       3. CINEMATIC REALISTIC BIRD CANVAS SIMULATION
+       ======================================================== */
+    const canvas = document.getElementById('sky-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Realistic Dove Flight Physics Model
+    class RealisticDove {
+      constructor(isHero = false) {
+        this.reset(isHero);
+      }
+      reset(isHero = false) {
+        this.isHero = isHero;
+        this.scale = isHero ? (0.9 + Math.random() * 0.25) : (0.35 + Math.random() * 0.4);
+        this.x = -80;
+        this.y = 80 + Math.random() * (height * 0.45);
+        this.speedX = this.isHero ? 2.2 : (1.2 + Math.random() * 1.2);
+        this.speedY = (Math.random() - 0.5) * 0.4;
+        this.wingBeat = Math.random() * Math.PI * 2;
+        this.wingFrequency = 0.08 + Math.random() * 0.03;
+        this.glideCooldown = 0;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.glideCooldown <= 0) {
+          this.wingBeat += this.wingFrequency;
+          if (Math.random() < 0.005) this.glideCooldown = 90; // Soar glide period
+        } else {
+          this.glideCooldown--;
+          this.wingBeat = Math.sin(this.wingBeat) * 0.2; // Flat wing glide
+        }
+
+        if (this.x > width + 100) this.reset(this.isHero);
+        if (this.y < 50 || this.y > height * 0.6) this.speedY *= -1;
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.scale(this.scale, this.scale);
+
+        const wingAngle = Math.sin(this.wingBeat);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.94)';
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
+        ctx.shadowBlur = 10;
+
+        // Fuselage / Torso
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 16, 6, -0.15, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Head and Beak
+        ctx.beginPath();
+        ctx.arc(14, -2, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#f3a953';
+        ctx.beginPath();
+        ctx.moveTo(17, -2);
+        ctx.lineTo(22, -1);
+        ctx.lineTo(17, 0);
+        ctx.fill();
+
+        // Fanned Tail Feathers
+        ctx.fillStyle = 'rgba(245, 240, 240, 0.88)';
+        ctx.beginPath();
+        ctx.moveTo(-12, 1);
+        ctx.lineTo(-26, -3);
+        ctx.lineTo(-28, 4);
+        ctx.closePath();
+        ctx.fill();
+
+        // Articulated Left Wing
+        ctx.save();
+        ctx.translate(2, -2);
+        ctx.rotate(-wingAngle * 0.75);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-15, -28, -25, -24);
+        ctx.quadraticCurveTo(-10, -5, 8, 0);
+        ctx.fill();
+        ctx.restore();
+
+        // Articulated Right Wing
+        ctx.save();
+        ctx.translate(2, 2);
+        ctx.rotate(wingAngle * 0.75);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-15, 28, -25, 24);
+        ctx.quadraticCurveTo(-10, 5, 8, 0);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.restore();
+      }
+    }
+
+    const doves = [new RealisticDove(true), new RealisticDove(), new RealisticDove(), new RealisticDove(), new RealisticDove()];
+
+    function renderSky() {
+      // Burgundy & Amber Atmospheric Sky
+      const grad = ctx.createLinearGradient(0, 0, 0, height);
+      grad.addColorStop(0, '#0c0407');
+      grad.addColorStop(0.3, '#240813');
+      grad.addColorStop(0.65, '#421321');
+      grad.addColorStop(0.88, '#69261a');
+      grad.addColorStop(1, '#0a0407');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      doves.forEach(d => {
+        d.update();
+        d.draw();
+      });
+
+      requestAnimationFrame(renderSky);
+    }
+    renderSky();
+
+    /* ========================================================
+       4. 3D BOOKSHELF ENGINE (FIRST SECTION)
+       ======================================================== */
+    const shelfStage = document.getElementById('shelfStage');
+    const selectedBookMeta = document.getElementById('selectedBookMeta');
+
+    function render3DShelf() {
+      shelfStage.innerHTML = '';
+
+      const filtered = currentBooks.filter(b => {
+        return shelfLangFilter === 'all' || b.language.toLowerCase() === shelfLangFilter.toLowerCase();
+      });
+
+      if (filtered.length === 0) {
+        shelfStage.innerHTML = `<div class="text-stone-400 italic text-sm py-12">No books found in this language category.</div>`;
+        return;
+      }
+
+      filtered.forEach(book => {
+        const item = document.createElement('div');
+        item.className = 'book-item';
+        item.dataset.id = book.id;
+
+        const cover = book.cover_image || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80';
+
+        item.innerHTML = `
+          <!-- Spine (Faces visitor) -->
+          <div class="book-spine" style="background: ${book.spine_color || '#2b1b17'}">
+            <span class="text-[10px] font-bold tracking-widest text-[#e5b364]">${book.language.substring(0,3).toUpperCase()}</span>
+            <span class="spine-title">${book.title}</span>
+            <span class="text-[9px] text-stone-400">${book.year || '2026'}</span>
+          </div>
+
+          <!-- 3D Front Cover (Rotates 90 deg forward when clicked) -->
+          <div class="book-front" style="background-image: url('${cover}')">
+            <div class="book-front-overlay">
+              <span class="text-[10px] font-bold text-[#e5b364] uppercase">${book.category}</span>
+              <div class="font-['Cinzel'] text-base font-bold text-white leading-tight mb-1">${book.title}</div>
+              <div class="text-[11px] text-stone-300 mb-2">by ${book.author}</div>
+              <span class="inline-block py-1 px-3 bg-[#e5b364] text-black text-[9px] font-bold tracking-widest uppercase rounded">
+                <i class="fa-solid fa-book-open mr-1"></i> INSPECT
+              </span>
+            </div>
+          </div>
+        `;
+
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (item.classList.contains('selected')) {
+            openDetails(book);
+          } else {
+            selectShelfBook(book.id);
+          }
+        });
+
+        shelfStage.appendChild(item);
+      });
+    }
+
+    function selectShelfBook(id) {
+      selectedBookId = id;
+      const book = currentBooks.find(b => b.id === id);
+
+      document.querySelectorAll('.book-item').forEach(el => {
+        if (el.dataset.id === id) {
+          el.classList.add('selected');
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          el.classList.remove('selected');
+        }
+      });
+
+      if (book) {
+        selectedBookMeta.innerHTML = `
+          <div class="font-['Cinzel'] text-xl text-[#f4d08a] tracking-wider mb-1">${book.title}</div>
+          <div class="text-xs text-stone-400 tracking-wider">By ${book.author} • ${book.language} • ${book.category} (Click cover to open details)</div>
+        `;
+      }
+    }
+
+    // Shelf Controls
+    document.getElementById('shelfPrev').addEventListener('click', () => shelfStage.scrollBy({ left: -240, behavior: 'smooth' }));
+    document.getElementById('shelfNext').addEventListener('click', () => shelfStage.scrollBy({ left: 240, behavior: 'smooth' }));
+
+    // Language Filter Buttons
+    document.querySelectorAll('#shelfLangFilters .pill-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#shelfLangFilters .pill-btn').forEach(b => {
+          b.className = 'pill-btn px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-white/10 text-stone-400 hover:text-white transition';
+        });
+        btn.className = 'pill-btn active px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-[#e5b364] bg-[#e5b364]/20 text-[#e5b364] transition';
+        shelfLangFilter = btn.dataset.lang;
+        render3DShelf();
+      });
+    });
+
+    /* ========================================================
+       5. ARCHIVE COLLECTIONS GRID ENGINE (SECOND SECTION)
+       ======================================================== */
+    const archiveGrid = document.getElementById('archiveGrid');
+
+    function renderArchiveGrid() {
+      archiveGrid.innerHTML = '';
+
+      currentBooks.forEach(book => {
+        const cover = book.cover_image || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80';
+        const card = document.createElement('div');
+        card.className = 'bg-[#15070d] border border-white/10 rounded overflow-hidden flex flex-col hover:border-[#e5b364]/40 transition group';
+
+        card.innerHTML = `
+          <!-- Card Image with Rating and Language Badge -->
+          <div class="relative h-72 w-full overflow-hidden bg-black">
+            <img src="${cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+            <div class="absolute top-3 right-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded text-xs font-bold text-[#e5b364] border border-white/10">
+              ⭐ ${book.rating || '4.9'}
+            </div>
+            <div class="absolute bottom-3 left-3 bg-[#70202e] px-2.5 py-1 rounded text-[10px] font-bold text-white tracking-widest uppercase">
+              ${book.language.toUpperCase()}
+            </div>
+          </div>
+
+          <!-- Card Content -->
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] font-bold tracking-widest text-[#e5b364] uppercase mb-1">
+                ${book.category} • ${book.year || '2026'}
+              </div>
+              <h3 class="font-['Cinzel'] text-lg font-bold text-white tracking-wide leading-snug mb-0.5">
+                ${book.title}
+              </h3>
+              ${book.native_title ? `<div class="font-['Cormorant_Garamond'] text-sm italic text-[#c86d51] mb-2">${book.native_title}</div>` : '<div class="h-2"></div>'}
+              <div class="text-xs text-stone-400 mb-3">By ${book.author}</div>
+              <p class="text-xs text-stone-300 line-clamp-3 leading-relaxed mb-4">
+                ${book.description}
+              </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-3 pt-3 border-t border-white/5">
+              <button class="details-trigger flex-1 py-2 text-xs font-semibold tracking-wider text-stone-300 hover:text-white uppercase transition text-left" data-id="${book.id}">
+                DETAILS ↗
+              </button>
+              <button class="read-trigger px-4 py-2 bg-[#70202e] hover:bg-[#8a2638] text-white text-xs font-bold tracking-widest uppercase rounded flex items-center gap-1.5 transition" data-id="${book.id}">
+                <i class="fa-solid fa-book-open text-[10px]"></i> READ
+              </button>
+            </div>
+          </div>
+        `;
+
+        archiveGrid.appendChild(card);
+      });
+
+      // Bind Details and Read buttons
+      document.querySelectorAll('.details-trigger').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const b = currentBooks.find(x => x.id === btn.dataset.id);
+          if (b) openDetails(b);
+        });
+      });
+      document.querySelectorAll('.read-trigger').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const b = currentBooks.find(x => x.id === btn.dataset.id);
+          if (b) openReader(b);
+        });
+      });
+    }
+
+    /* ========================================================
+       6. MODAL SYSTEM (DETAILS & READER)
+       ======================================================== */
+    const detailsModal = document.getElementById('detailsModal');
+    let activeBook = null;
+
+    function openDetails(book) {
+      activeBook = book;
+      document.getElementById('modalCoverImg').src = book.cover_image || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80';
+      document.getElementById('modalTitle').textContent = book.title;
+      document.getElementById('modalAuthor').textContent = `by ${book.author}`;
+      document.getElementById('modalLang').textContent = book.language;
+      document.getElementById('modalCat').textContent = book.category;
+      document.getElementById('modalYear').textContent = book.year || '2026';
+      document.getElementById('modalRating').textContent = `⭐ ${book.rating || '4.9'}`;
+      document.getElementById('modalDesc').textContent = book.description;
+      detailsModal.classList.add('active');
+    }
+
+    document.getElementById('closeDetailsBtn').addEventListener('click', () => detailsModal.classList.remove('active'));
+    document.getElementById('closeDetailsBtn2').addEventListener('click', () => detailsModal.classList.remove('active'));
+
+    // Digital Reader
+    const readerModal = document.getElementById('readerModal');
+    const readerBody = document.getElementById('readerBody');
+    let readerFontSize = 24;
+
+    function openReader(book) {
+      detailsModal.classList.remove('active');
+      document.getElementById('readerTitle').textContent = `${book.title} — ${book.author}`;
+      readerBody.innerHTML = (book.content && book.content.trim() !== '') 
+        ? book.content.replace(/\n/g, '<br><br>')
+        : `<p>Welcome to <em>${book.title}</em>.<br><br>${book.description}</p>`;
+      readerModal.classList.add('active');
+    }
+
+    document.getElementById('modalReadBtn').addEventListener('click', () => {
+      if (activeBook) openReader(activeBook);
+    });
+    document.getElementById('closeReaderBtn').addEventListener('click', () => readerModal.classList.remove('active'));
+
+    document.getElementById('fontInc').addEventListener('click', () => {
+      readerFontSize += 2;
+      readerBody.style.fontSize = readerFontSize + 'px';
+    });
+    document.getElementById('fontDec').addEventListener('click', () => {
+      if (readerFontSize > 16) readerFontSize -= 2;
+      readerBody.style.fontSize = readerFontSize + 'px';
+    });
+
+    /* ========================================================
+       7. SECRET OWNER CURATOR PORTAL & CLOUD POST
+       ======================================================== */
+    const adminModal = document.getElementById('adminModal');
+    const adminPinScreen = document.getElementById('adminPinScreen');
+    const adminPostScreen = document.getElementById('adminPostScreen');
+    const adminPinInput = document.getElementById('adminPinInput');
+    let logoClicks = 0;
+    let uploadedCoverBase64 = "";
+
+    function openAdmin() {
+      adminModal.classList.add('active');
+      adminPinScreen.classList.remove('hidden');
+      adminPostScreen.classList.add('hidden');
+      adminPinInput.value = '';
+      adminPinInput.focus();
+    }
+    function closeAdmin() {
+      adminModal.classList.remove('active');
+    }
+
+    document.getElementById('closeAdminBtn').addEventListener('click', closeAdmin);
+
+    // Secret 1: Triple-Click Header Logo
+    document.getElementById('brandLogo').addEventListener('click', () => {
+      logoClicks++;
+      if (logoClicks === 3) {
+        logoClicks = 0;
+        openAdmin();
+      }
+      setTimeout(() => { logoClicks = 0; }, 1200);
+    });
+
+    // Secret 2: Shortcut Ctrl + Shift + A
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        openAdmin();
+      }
+    });
+
+    // Secret 3: URL #admin
+    if (window.location.hash === '#admin') openAdmin();
+
+    // Verify PIN
+    document.getElementById('adminLoginBtn').addEventListener('click', () => {
+      if (adminPinInput.value === MASTER_PIN) {
+        adminPinScreen.classList.add('hidden');
+        adminPostScreen.classList.remove('hidden');
+      } else {
+        alert('Invalid PIN!');
+      }
+    });
+
+    // Handle Local Image File Upload
+    const filePickerBtn = document.getElementById('filePickerBtn');
+    const coverFileInput = document.getElementById('coverFileInput');
+    const fileUploadStatus = document.getElementById('fileUploadStatus');
+
+    filePickerBtn.addEventListener('click', () => coverFileInput.click());
+    coverFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          uploadedCoverBase64 = evt.target.result;
+          fileUploadStatus.textContent = `✓ Selected: ${file.name}`;
+          fileUploadStatus.classList.add('text-[#e5b364]');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Post to Supabase Cloud Database Form
+    document.getElementById('addBookForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBookBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> UPLOADING TO CLOUD...`;
+
+      const title = document.getElementById('postTitle').value.trim();
+      const native_title = document.getElementById('postNativeTitle').value.trim();
+      const author = document.getElementById('postAuthor').value.trim();
+      const language = document.getElementById('postLang').value;
+      const category = document.getElementById('postCat').value;
+      const year = document.getElementById('postYear').value;
+      const spine_color = document.getElementById('postSpineColor').value;
+      const rating = parseFloat(document.getElementById('postRating').value) || 4.9;
+      const coverUrl = document.getElementById('postCoverUrl').value.trim();
+      const description = document.getElementById('postDesc').value.trim();
+      const content = document.getElementById('postContent').value.trim();
+
+      const finalCover = uploadedCoverBase64 || coverUrl || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80';
+
+      const newRecord = {
+        title,
+        native_title,
+        author,
+        language,
+        category,
+        year,
+        rating,
+        spine_color,
+        cover_image: finalCover,
+        description,
+        content
+      };
+
+      if (supabaseClient) {
+        // Upload directly to Supabase table
+        const { error } = await supabaseClient.from('books').insert([newRecord]);
+        if (error) {
+          alert('Supabase Error: ' + error.message);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF`;
+          return;
+        }
+      } else {
+        // Fallback to local storage
+        newRecord.id = 'local_' + Date.now();
+        const local = localStorage.getItem('yours_ebook_local_shelf');
+        const list = local ? JSON.parse(local) : [...initialSeedBooks];
+        list.unshift(newRecord);
+        localStorage.setItem('yours_ebook_local_shelf', JSON.stringify(list));
+      }
+
+      alert(`"${title}" published successfully to Cloud Database!`);
+      document.getElementById('addBookForm').reset();
+      uploadedCoverBase64 = '';
+      fileUploadStatus.textContent = "Click to select photo from your device";
+      fileUploadStatus.classList.remove('text-[#e5b364]');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF`;
+      closeAdmin();
+
+      // Refresh live books
+      await loadBooks();
+    });
+
+    // Initialize
+    loadBooks();
+  </script>
+</body>
+</html>
