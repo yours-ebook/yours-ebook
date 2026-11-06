@@ -196,6 +196,92 @@
       opacity: 1;
       pointer-events: auto;
     }
+
+    /* ========================================================
+       RENAISSANCE OIL-PAINTING CLOUD FALLBACK ENGINE
+       ======================================================== */
+    .sky-world-fallback {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .sky-backdrop-fallback {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 38%, #4a8fc2 0%, #c97f48 45%, #7a2b22 75%, #18050e 100%);
+    }
+    .sunlight-core-fallback {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 75vw;
+      height: 50vh;
+      background: radial-gradient(ellipse at center, rgba(250, 195, 100, 0.55) 0%, rgba(225, 120, 50, 0.3) 45%, rgba(0, 0, 0, 0) 75%);
+      filter: blur(45px);
+      mix-blend-mode: screen;
+    }
+    .cloud-cluster-fallback {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(28px);
+      will-change: transform;
+    }
+    .cloud-layer-back-fallback {
+      width: 140%;
+      height: 120%;
+      top: -10%;
+      left: -20%;
+      background: 
+        radial-gradient(circle at 20% 40%, rgba(210, 115, 50, 0.85) 0%, transparent 45%),
+        radial-gradient(circle at 80% 35%, rgba(190, 85, 45, 0.8) 0%, transparent 50%),
+        radial-gradient(circle at 50% 60%, rgba(135, 40, 50, 0.9) 0%, transparent 60%);
+      animation: slowDriftBack 45s ease-in-out infinite alternate;
+    }
+    .cloud-layer-mid-fallback {
+      position: absolute;
+      inset: -15%;
+      background: 
+        radial-gradient(ellipse at 18% 25%, rgba(255, 215, 140, 0.9) 0%, rgba(215, 115, 55, 0.65) 30%, transparent 55%),
+        radial-gradient(ellipse at 82% 30%, rgba(250, 195, 120, 0.85) 0%, rgba(195, 90, 45, 0.6) 32%, transparent 55%),
+        radial-gradient(circle at 35% 70%, rgba(155, 48, 58, 0.88) 0%, transparent 45%),
+        radial-gradient(circle at 75% 75%, rgba(110, 30, 48, 0.92) 0%, transparent 50%);
+      filter: blur(22px);
+      animation: driftMid 32s ease-in-out infinite alternate;
+      mix-blend-mode: hard-light;
+    }
+    .cloud-layer-front-fallback {
+      position: absolute;
+      width: 130%;
+      height: 100%;
+      bottom: -20%;
+      left: -15%;
+      background: 
+        radial-gradient(ellipse at 25% 60%, rgba(235, 150, 90, 0.75) 0%, rgba(125, 35, 45, 0.85) 40%, transparent 65%),
+        radial-gradient(ellipse at 75% 65%, rgba(245, 170, 105, 0.75) 0%, rgba(140, 40, 52, 0.9) 42%, transparent 65%),
+        radial-gradient(ellipse at 50% 85%, rgba(45, 12, 22, 0.95) 0%, rgba(18, 5, 10, 1) 60%);
+      filter: blur(25px);
+      animation: driftFront 26s ease-in-out infinite alternate;
+    }
+    @keyframes slowDriftBack {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(25px, -15px, 0) scale(1.04); }
+      100% { transform: translate3d(-20px, 10px, 0) scale(0.98); }
+    }
+    @keyframes driftMid {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(-35px, 20px, 0) scale(1.06); }
+      100% { transform: translate3d(30px, -15px, 0) scale(0.96); }
+    }
+    @keyframes driftFront {
+      0% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(30px, -10px, 0) scale(1.03); }
+      100% { transform: translate3d(-25px, 15px, 0) scale(1); }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -228,10 +314,19 @@
   <!-- CINEMATIC HERO SECTION WITH REALISTIC CLOUDS & BIRDS -->
   <section class="relative w-full h-screen min-h-[640px] flex items-center justify-center text-center overflow-hidden px-4" id="hero">
     
-    <!-- WEBGL SHADER CLOUD BACKGROUND -->
-    <canvas id="cloud-gl" class="absolute inset-0 w-full h-full z-0 block pointer-events-none" aria-hidden="true"></canvas>
+    <!-- 1. REALISTIC CSS DRIFTING CLOUDS (ALWAYS ACTIVE FALLBACK) -->
+    <div class="sky-world-fallback" id="cssClouds">
+      <div class="sky-backdrop-fallback"></div>
+      <div class="sunlight-core-fallback"></div>
+      <div class="cloud-cluster-fallback cloud-layer-back-fallback"></div>
+      <div class="cloud-cluster-fallback cloud-layer-mid-fallback"></div>
+      <div class="cloud-cluster-fallback cloud-layer-front-fallback"></div>
+    </div>
 
-    <!-- Transparent Avian Simulation Canvas -->
+    <!-- 2. WEBGL SHADER CLOUD CANVAS (RUNS WHEN WEBGL IS AVAILABLE) -->
+    <canvas id="cloud-gl" class="absolute inset-0 w-full h-full z-[1] block pointer-events-none" aria-hidden="true"></canvas>
+
+    <!-- 3. TRANSPARENT FLYING DOVES CANVAS -->
     <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
     <div class="absolute inset-0 bg-radial-at-center from-[#260a15]/10 via-[#0a0407]/45 to-[#0a0407] z-10 pointer-events-none"></div>
 
@@ -746,7 +841,6 @@
     const doves = [new RealisticDove(true), new RealisticDove(), new RealisticDove(), new RealisticDove(), new RealisticDove()];
 
     function renderSky() {
-      // Clear canvas so the shader clouds behind it stay completely visible
       ctx.clearRect(0, 0, width, height);
 
       doves.forEach(d => {
@@ -1138,7 +1232,6 @@
       submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF`;
       closeAdmin();
 
-      // Instantly refresh 3D shelf and archive collections
       await loadBooks();
     });
 
@@ -1146,19 +1239,20 @@
     loadBooks();
   </script>
 
-  <!-- WEBGL SHADER CLOUDS (100% Windows, Chrome & Netlify Compatible) -->
+  <!-- WEBGL SHADER CLOUDS (WITH STRICT GLSL ES 1.00 & SEAMLESS CSS FALLBACK) -->
   <script>
   (function () {
     const canvas = document.getElementById('cloud-gl');
     const hero = document.getElementById('hero');
+    const cssClouds = document.getElementById('cssClouds');
     if (!canvas || !hero) return;
 
-    // WebGL Context with Experimental fallback
     const gl = canvas.getContext('webgl', { antialias: false, alpha: false }) || 
                canvas.getContext('experimental-webgl', { antialias: false, alpha: false });
 
-    if (!gl) { 
-      hero.style.background = 'linear-gradient(#4a8fc2,#f2b233)'; 
+    // WebGL available na thakle CSS clouds on thakbe ebong safe exit korbe
+    if (!gl) {
+      console.warn("WebGL not available. Active fallback: Renaissance CSS Volumetric Clouds.");
       return; 
     }
 
@@ -1180,10 +1274,11 @@
     uniform float uDusk;
     uniform vec2  uMouse;
 
-    // Strict GLSL ES 1.0 compatible vector operations
+    // Strict 100% GLSL ES 1.0 compatible vector operations
     float hash(vec2 p){ 
       p = fract(p * vec2(123.34, 456.21)); 
-      p += vec2(dot(p, p + vec2(45.32, 45.32))); 
+      float d = dot(p, p + vec2(45.32, 45.32));
+      p += vec2(d, d); 
       return fract(p.x * p.y); 
     }
 
@@ -1258,7 +1353,7 @@
       gl.shaderSource(sh, src); 
       gl.compileShader(sh);
       if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
-        console.error('Cloud shader error:', gl.getShaderInfoLog(sh));
+        console.error('Cloud shader compile error:', gl.getShaderInfoLog(sh));
       }
       return sh;
     }
@@ -1267,7 +1362,16 @@
     gl.attachShader(prog, compile(gl.VERTEX_SHADER, vert));
     gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
     gl.linkProgram(prog);
+
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.warn("Shader linking failed. Keeping CSS clouds active.");
+      return;
+    }
+
     gl.useProgram(prog);
+
+    // WebGL Shader সফলভাবে চালু হলে CSS মেঘ সরিয়ে দিয়ে GPU শ্যাডার ফুল অ্যাক্টিভ করা
+    if (cssClouds) cssClouds.style.display = 'none';
 
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
