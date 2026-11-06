@@ -19,9 +19,6 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Realistic Clouds CSS -->
-  <link rel="stylesheet" href="clouds.css">
-
   <style>
     :root {
       --bg-dark: #0a0407;
@@ -186,6 +183,19 @@
       display: flex;
       opacity: 1;
     }
+
+    /* Custom Toast Message Box */
+    #customToast {
+      transform: translateY(100px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #customToast.active {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -218,15 +228,8 @@
   <!-- CINEMATIC HERO SECTION WITH REALISTIC CLOUDS & BIRDS -->
   <section class="relative w-full h-screen min-h-[640px] flex items-center justify-center text-center overflow-hidden px-4" id="hero">
     
-    <!-- REALISTIC RENAISSANCE DRIFTING CLOUDS LAYER -->
-    <div class="sky-world">
-      <div class="sky-backdrop"></div>
-      <div class="sunlight-core"></div>
-      <div class="cloud-cluster cloud-layer-back"></div>
-      <div class="cloud-cluster cloud-layer-mid"></div>
-      <div class="cloud-cluster cloud-layer-front"></div>
-      <div class="oil-canvas-sheen"></div>
-    </div>
+    <!-- WEBGL SHADER CLOUD BACKGROUND -->
+    <canvas id="cloud-gl" class="absolute inset-0 w-full h-full z-0 block pointer-events-none" aria-hidden="true"></canvas>
 
     <!-- Transparent Avian Simulation Canvas -->
     <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
@@ -500,6 +503,12 @@
     </div>
   </div>
 
+  <!-- CUSTOM NON-BLOCKING TOAST BOX -->
+  <div id="customToast" class="fixed bottom-6 right-6 z-[140] bg-[#1a0810] border border-[#e5b364] text-white px-5 py-3.5 rounded shadow-2xl flex items-center gap-3 text-xs">
+    <i class="fa-solid fa-circle-info text-[#e5b364] text-base" id="toastIcon"></i>
+    <span id="toastMessage">Notification message</span>
+  </div>
+
   <!-- SINGLE-LINE FOOTER -->
   <footer class="bg-[#050204] border-t border-[#e5b364]/10 py-6 px-6 sm:px-12 mt-auto">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-3 text-[11px] sm:text-xs text-stone-400">
@@ -524,12 +533,23 @@
     /* ========================================================
        1. SUPABASE CREDENTIALS CONFIGURATION
        ======================================================== */
-    const SUPABASE_URL = "https://rjfvzvbpiepatngotlfm.supabase.co"; // Line 478: Paste Project URL
-    const SUPABASE_ANON_KEY = "sb_publishable_OSBZZ7-fUj7ubTmrYp3IVQ_-ctSFLmv"; // Line 479: Paste Anon Key
+    const SUPABASE_URL = "https://rjfvzvbpiepatngotlfm.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_OSBZZ7-fUj7ubTmrYp3IVQ_-ctSFLmv";
 
     let supabaseClient = null;
     if (SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" && window.supabase) {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    // Helper: Toast notification (Replaces alert)
+    function notify(msg, isError = false) {
+      const toast = document.getElementById('customToast');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+      toastMsg.textContent = msg;
+      toastIcon.className = isError ? 'fa-solid fa-triangle-exclamation text-rose-400 text-base' : 'fa-solid fa-circle-check text-emerald-400 text-base';
+      toast.classList.add('active');
+      setTimeout(() => toast.classList.remove('active'), 3500);
     }
 
     const initialSeedBooks = [
@@ -726,7 +746,7 @@
     const doves = [new RealisticDove(true), new RealisticDove(), new RealisticDove(), new RealisticDove(), new RealisticDove()];
 
     function renderSky() {
-      // Clear canvas so background clouds from clouds.css stay completely visible
+      // Clear canvas so the shader clouds behind it stay completely visible
       ctx.clearRect(0, 0, width, height);
 
       doves.forEach(d => {
@@ -1004,7 +1024,7 @@
       const loginBtn = document.getElementById('adminLoginBtn');
 
       if (!email || !password) {
-        alert("Please enter both Admin Email and Password.");
+        notify("Please enter both Admin Email and Password.", true);
         return;
       }
 
@@ -1018,7 +1038,7 @@
         });
 
         if (error) {
-          alert("Access Denied: " + error.message);
+          notify("Access Denied: " + error.message, true);
           loginBtn.disabled = false;
           loginBtn.innerText = "UNLOCK PORTAL";
         } else {
@@ -1027,9 +1047,10 @@
           document.getElementById('adminPasswordInput').value = '';
           loginBtn.disabled = false;
           loginBtn.innerText = "UNLOCK PORTAL";
+          notify("Welcome, Curator! Portal Unlocked.");
         }
       } else {
-        alert("Please configure your SUPABASE_URL and SUPABASE_ANON_KEY first.");
+        notify("Please configure your SUPABASE_URL and SUPABASE_ANON_KEY first.", true);
         loginBtn.disabled = false;
         loginBtn.innerText = "UNLOCK PORTAL";
       }
@@ -1041,6 +1062,7 @@
       adminPostScreen.classList.add('hidden');
       adminPinScreen.classList.remove('hidden');
       closeAdmin();
+      notify("Logged out successfully.");
     });
 
     // Local Image Upload Handler
@@ -1100,14 +1122,14 @@
       if (supabaseClient) {
         const { error } = await supabaseClient.from('books').insert([newRecord]);
         if (error) {
-          alert('Upload Failed: ' + error.message);
+          notify('Upload Failed: ' + error.message, true);
           submitBtn.disabled = false;
           submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF`;
           return;
         }
       }
 
-      alert(`"${title}" published successfully to Cloud Database!`);
+      notify(`"${title}" published successfully to Cloud Database!`);
       document.getElementById('addBookForm').reset();
       uploadedCoverBase64 = '';
       fileUploadStatus.textContent = "Click to select photo from your device";
@@ -1123,5 +1145,150 @@
     // Run Initial Load
     loadBooks();
   </script>
+
+  <!-- WEBGL SHADER CLOUDS (hero background) -->
+  <script>
+  (function () {
+    const canvas = document.getElementById('cloud-gl');
+    const hero = document.getElementById('hero');
+    if (!canvas || !hero) return;
+    const gl = canvas.getContext('webgl', { antialias: false, alpha: false });
+    if (!gl) { hero.style.background = 'linear-gradient(#4a8fc2,#f2b233)'; return; }
+
+    const QUALITY = 0.6;   // lower = faster on phones (0.4 to 1)
+    const DUSK = 0.7;      // 0 = keep blue/gold sky, 1 = turn dark maroon as you scroll down
+
+    const vert = 'attribute vec2 a; void main(){ gl_Position = vec4(a,0.,1.); }';
+
+    const frag = `
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+    precision highp float;
+    #else
+    precision mediump float;
+    #endif
+    uniform vec2  uRes;
+    uniform float uTime;
+    uniform float uScroll;
+    uniform float uDusk;
+    uniform vec2  uMouse;
+
+    float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
+
+    float vnoise(vec2 p){
+      vec2 i = floor(p), f = fract(p);
+      f = f*f*(3.0-2.0*f);
+      return mix(mix(hash(i),           hash(i+vec2(1.0,0.0)), f.x),
+                 mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), f.x), f.y);
+    }
+
+    float fbm(vec2 p){
+      float v = 0.0, a = 0.5;
+      mat2 m = mat2(1.6,1.2,-1.2,1.6);
+      for(int i=0;i<6;i++){ v += a*vnoise(p); p = m*p; a *= 0.5; }
+      return v;
+    }
+
+    vec4 cloudLayer(vec2 uv, float scale, float drift, float parallax, float cover, float soft){
+      vec2 p = uv*scale + vec2(uTime*drift, 0.0) - vec2(0.0, uScroll*parallax) + uMouse*parallax*0.05;
+      float d  = fbm(p);
+      float al = smoothstep(cover, cover+soft, d);
+      float l2 = fbm(p + vec2(-0.10, 0.12));
+      float lt = clamp((d - l2)*6.5 + 0.5, 0.0, 1.0);
+      vec3 cShade = vec3(0.30,0.17,0.20);
+      vec3 cMid   = vec3(0.86,0.58,0.36);
+      vec3 cLight = vec3(1.00,0.90,0.68);
+      vec3 col = mix(cShade, cMid, smoothstep(0.0,0.55,lt));
+      col = mix(col, cLight, smoothstep(0.55,1.0,lt));
+      return vec4(col, al);
+    }
+
+    void main(){
+      vec2 uv  = gl_FragCoord.xy / uRes.y;
+      vec2 nuv = gl_FragCoord.xy / uRes;
+
+      vec3 skyBlue = vec3(0.27,0.52,0.78);
+      vec3 skyGold = vec3(0.98,0.72,0.22);
+      float glow = exp(-pow(length((nuv-vec2(0.45,0.62))*vec2(1.2,1.0)),2.0)*3.2);
+      vec3 col = mix(skyBlue, skyGold, clamp(glow + (1.0-nuv.y)*0.25, 0.0, 1.0));
+
+      vec4 cFar = cloudLayer(uv+vec2(3.0,0.0), 1.6, 0.010, 0.25, 0.46, 0.22);
+      cFar.a *= 0.55 * smoothstep(0.1, 0.9, nuv.y);
+      col = mix(col, cFar.rgb, cFar.a);
+
+      vec4 cMid = cloudLayer(uv+vec2(9.0,2.0), 2.3, 0.020, 0.60, 0.44, 0.15);
+      cMid.a *= 0.9 * (smoothstep(0.85,0.15,nuv.y)*0.8 + 0.25*smoothstep(0.6,1.0,nuv.y));
+      col = mix(col, cMid.rgb, cMid.a);
+
+      vec4 cNear = cloudLayer(uv+vec2(17.0,5.0), 3.2, 0.035, 1.20, 0.43, 0.13);
+      cNear.a *= smoothstep(0.55, 0.0, nuv.y) + 0.9*smoothstep(0.70,1.0,nuv.x)*smoothstep(0.3,0.8,nuv.y);
+      col = mix(col, cNear.rgb, clamp(cNear.a,0.0,1.0));
+
+      col *= 1.0 - 0.35*pow(length(nuv-0.5)*1.25, 2.0);
+
+      float dusk = smoothstep(0.15, 1.0, uScroll) * uDusk;
+      vec3 night = mix(vec3(0.23,0.04,0.04), vec3(0.45,0.20,0.15), (col.r+col.g)*0.35);
+      col = mix(col, night*(0.5+0.5*col), dusk);
+
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+
+    function compile(type, src){
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src); gl.compileShader(sh);
+      if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) console.error('Cloud shader:', gl.getShaderInfoLog(sh));
+      return sh;
+    }
+    const prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vert));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
+    gl.linkProgram(prog); gl.useProgram(prog);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, 'a');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    const U = n => gl.getUniformLocation(prog, n);
+    const uRes = U('uRes'), uTime = U('uTime'), uScroll = U('uScroll'), uMouse = U('uMouse');
+    gl.uniform1f(U('uDusk'), DUSK);
+
+    function resize(){
+      const w = Math.max(1, Math.floor(hero.clientWidth  * QUALITY));
+      const h = Math.max(1, Math.floor(hero.clientHeight * QUALITY));
+      canvas.width = w; canvas.height = h;
+      gl.viewport(0, 0, w, h);
+      gl.uniform2f(uRes, w, h);
+    }
+    window.addEventListener('resize', resize); resize();
+
+    let scroll = 0, target = 0, mx = 0, my = 0, tx = 0, ty = 0, visible = true;
+    window.addEventListener('scroll', () => { target = window.scrollY / hero.clientHeight; }, { passive: true });
+    window.addEventListener('pointermove', e => { tx = e.clientX/innerWidth*2-1; ty = -(e.clientY/innerHeight*2-1); });
+    target = window.scrollY / hero.clientHeight;
+
+    // Pause WebGL rendering loop when scrolled past the hero section to save resources
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(hero);
+    }
+
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const t0 = performance.now();
+
+    function frame(now){
+      requestAnimationFrame(frame);
+      if (!visible) return;
+      scroll += (target - scroll) * 0.08;
+      mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
+      gl.uniform1f(uTime, still ? 0 : (now - t0) / 1000);
+      gl.uniform1f(uScroll, Math.min(scroll, 1.5));
+      gl.uniform2f(uMouse, mx, my);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+    requestAnimationFrame(frame);
+  })();
+  </script>
+
 </body>
 </html>
