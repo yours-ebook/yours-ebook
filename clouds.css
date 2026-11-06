@@ -1,0 +1,111 @@
+/* ========================================================
+   RENAISSANCE OIL-PAINTING REALISTIC CLOUD ENGINE
+   ======================================================== */
+
+.sky-world {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Atmospheric Sunset Sky Base Gradient */
+.sky-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 35%, #427ea4 0%, #a45a38 35%, #5a1e28 65%, #18060e 100%);
+  opacity: 0.95;
+}
+
+/* Renaissance Golden Sunlight Glow */
+.sunlight-core {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 75vw;
+  height: 55vh;
+  background: radial-gradient(ellipse at center, rgba(245, 179, 87, 0.45) 0%, rgba(212, 107, 56, 0.25) 45%, rgba(0, 0, 0, 0) 75%);
+  filter: blur(50px);
+  mix-blend-mode: screen;
+}
+
+/* Base Cloud Structure */
+.cloud-cluster {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(32px);
+  will-change: transform;
+}
+
+/* Layer 1: Deep Amber Massive Background Clouds */
+.cloud-layer-back {
+  width: 140%;
+  height: 120%;
+  top: -10%;
+  left: -20%;
+  background: 
+    radial-gradient(circle at 20% 40%, rgba(189, 93, 42, 0.8) 0%, transparent 45%),
+    radial-gradient(circle at 80% 35%, rgba(168, 71, 38, 0.75) 0%, transparent 50%),
+    radial-gradient(circle at 50% 60%, rgba(115, 34, 45, 0.9) 0%, transparent 60%);
+  animation: slowDriftBack 45s ease-in-out infinite alternate;
+}
+
+/* Layer 2: Volumetric Golden Rim Clouds (Fluffy Cumulus) */
+.cloud-layer-mid {
+  position: absolute;
+  inset: -15%;
+  background: 
+    radial-gradient(ellipse at 15% 25%, rgba(248, 203, 134, 0.85) 0%, rgba(198, 97, 47, 0.6) 30%, transparent 55%),
+    radial-gradient(ellipse at 85% 30%, rgba(245, 185, 110, 0.8) 0%, rgba(180, 80, 40, 0.55) 32%, transparent 55%),
+    radial-gradient(circle at 30% 70%, rgba(140, 42, 52, 0.85) 0%, transparent 45%),
+    radial-gradient(circle at 75% 75%, rgba(98, 25, 42, 0.9) 0%, transparent 50%);
+  filter: blur(24px);
+  animation: driftMid 32s ease-in-out infinite alternate;
+  mix-blend-mode: hard-light;
+}
+
+/* Layer 3: Foreground Billowing Soft Edge Cumulus */
+.cloud-layer-front {
+  position: absolute;
+  width: 130%;
+  height: 100%;
+  bottom: -20%;
+  left: -15%;
+  background: 
+    radial-gradient(ellipse at 25% 60%, rgba(220, 140, 80, 0.7) 0%, rgba(110, 30, 40, 0.8) 40%, transparent 65%),
+    radial-gradient(ellipse at 75% 65%, rgba(235, 160, 95, 0.7) 0%, rgba(125, 35, 48, 0.85) 42%, transparent 65%),
+    radial-gradient(ellipse at 50% 85%, rgba(35, 10, 18, 0.95) 0%, rgba(15, 4, 8, 1) 60%);
+  filter: blur(28px);
+  animation: driftFront 26s ease-in-out infinite alternate;
+}
+
+/* Cinematic Grain / Fine Oil-Canvas Texture Overlay */
+.oil-canvas-sheen {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(10, 4, 7, 0.6) 100%);
+  pointer-events: none;
+}
+
+/* Ambient Drifting Animations */
+@keyframes slowDriftBack {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(25px, -15px, 0) scale(1.04); }
+  100% { transform: translate3d(-20px, 10px, 0) scale(0.98); }
+}
+
+@keyframes driftMid {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-35px, 20px, 0) scale(1.06); }
+  100% { transform: translate3d(30px, -15px, 0) scale(0.96); }
+}
+
+@keyframes driftFront {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(30px, -10px, 0) scale(1.03); }
+  100% { transform: translate3d(-25px, 15px, 0) scale(1); }
+}

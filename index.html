@@ -19,6 +19,9 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- Realistic Clouds CSS -->
+  <link rel="stylesheet" href="clouds.css">
+
   <style>
     :root {
       --bg-dark: #0a0407;
@@ -173,7 +176,7 @@
       pointer-events: none;
     }
 
-    /* Modal Transitions */
+    /* Modals */
     .app-modal {
       display: none;
       opacity: 0;
@@ -189,7 +192,6 @@
 
   <!-- HEADER -->
   <header class="fixed top-0 left-0 w-full h-[76px] px-6 sm:px-12 flex items-center justify-between bg-[#0a0407]/85 backdrop-blur-md border-b border-[#e5b364]/15 z-50">
-    <!-- Brand Logo (Triple-click for Curator Portal) -->
     <div class="flex items-center gap-3 cursor-pointer select-none" id="brandLogo" title="Triple-click for Curator Portal">
       <i class="fa-solid fa-book-atlas text-xl text-[#e5b364] drop-shadow-[0_0_10px_rgba(229,179,100,0.4)]"></i>
       <span class="font-['Cinzel'] text-lg sm:text-xl font-bold tracking-[3px] text-white uppercase">YOUR'S E-BOOK</span>
@@ -206,7 +208,6 @@
       <a href="#archiveSection" class="text-xs font-semibold tracking-[2px] text-[#cfbebe] hover:text-[#e5b364] transition">STORY</a>
     </div>
 
-    <!-- Search Action -->
     <div class="flex items-center gap-4">
       <button class="w-10 h-10 rounded-full border border-[#e5b364]/20 flex items-center justify-center text-[#e5b364] hover:bg-[#e5b364]/10 transition" id="searchTrigger" title="Search Books">
         <i class="fa-solid fa-magnifying-glass text-sm"></i>
@@ -214,11 +215,24 @@
     </div>
   </header>
 
-  <!-- CINEMATIC HERO SECTION -->
+  <!-- CINEMATIC HERO SECTION WITH REALISTIC CLOUDS & BIRDS -->
   <section class="relative w-full h-screen min-h-[640px] flex items-center justify-center text-center overflow-hidden px-4" id="hero">
-    <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-0"></canvas>
-    <div class="absolute inset-0 bg-radial-at-center from-[#260a15]/20 via-[#0a0407]/70 to-[#0a0407] z-10 pointer-events-none"></div>
+    
+    <!-- REALISTIC RENAISSANCE DRIFTING CLOUDS LAYER -->
+    <div class="sky-world">
+      <div class="sky-backdrop"></div>
+      <div class="sunlight-core"></div>
+      <div class="cloud-cluster cloud-layer-back"></div>
+      <div class="cloud-cluster cloud-layer-mid"></div>
+      <div class="cloud-cluster cloud-layer-front"></div>
+      <div class="oil-canvas-sheen"></div>
+    </div>
 
+    <!-- Transparent Avian Simulation Canvas -->
+    <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
+    <div class="absolute inset-0 bg-radial-at-center from-[#260a15]/10 via-[#0a0407]/45 to-[#0a0407] z-10 pointer-events-none"></div>
+
+    <!-- Hero Content -->
     <div class="relative z-20 max-w-4xl px-4 mt-12 animate-fade-in">
       <h1 class="font-['Cinzel'] text-4xl sm:text-6xl md:text-7xl font-black tracking-[6px] text-white drop-shadow-[0_4px_25px_rgba(0,0,0,0.9)] uppercase mb-3">
         YOUR'S E-BOOK
@@ -248,7 +262,7 @@
       <h2 class="font-['Cinzel'] text-3xl sm:text-4xl text-white tracking-[4px] uppercase">Grand Library Shelf</h2>
     </div>
 
-    <!-- Language Filter Pills -->
+    <!-- Filters -->
     <div class="w-full max-w-5xl mb-10 flex flex-col items-center gap-3">
       <div class="flex flex-wrap justify-center gap-2" id="shelfLangFilters">
         <button class="pill-btn active px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-[#e5b364] bg-[#e5b364]/20 text-[#e5b364] transition" data-lang="all">All Languages</button>
@@ -259,7 +273,7 @@
       </div>
     </div>
 
-    <!-- 3D Shelf Container -->
+    <!-- 3D Shelf Stage -->
     <div class="shelf-container relative w-full max-w-6xl h-[470px] flex flex-col justify-end items-center mb-6">
       <button class="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#1b0a11]/90 border border-[#e5b364]/30 text-[#e5b364] flex items-center justify-center hover:bg-[#e5b364] hover:text-black transition z-30" id="shelfPrev">
         <i class="fa-solid fa-chevron-left"></i>
@@ -373,7 +387,7 @@
     <div class="w-full max-w-xl bg-[#170810] border border-[#e5b364] rounded-lg p-7 shadow-2xl relative">
       <button class="absolute top-4 right-4 text-stone-400 hover:text-white" id="closeAdminBtn"><i class="fa-solid fa-xmark text-lg"></i></button>
 
-      <!-- Supabase Auth Login Screen (No PIN inside code) -->
+      <!-- Supabase Auth Login Screen -->
       <div id="adminPinScreen">
         <h3 class="font-['Cinzel'] text-xl text-[#e5b364] tracking-widest text-center uppercase mb-1">CURATOR ACCESS</h3>
         <p class="text-xs text-stone-400 text-center mb-6">Enter Admin Credentials to unlock post management</p>
@@ -394,7 +408,7 @@
         </button>
       </div>
 
-      <!-- Cloud Upload Screen (Accessible Only After Valid Login) -->
+      <!-- Cloud Upload Screen -->
       <div id="adminPostScreen" class="hidden">
         <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
           <h3 class="font-['Cinzel'] text-lg text-[#e5b364] tracking-wider uppercase">PUBLISH TO LIVE SHELF</h3>
@@ -505,13 +519,13 @@
     </div>
   </footer>
 
-  <!-- JAVASCRIPT & SUPABASE AUTH ENGINE -->
+  <!-- JAVASCRIPT & SUPABASE CLOUD ENGINE -->
   <script>
     /* ========================================================
        1. SUPABASE CREDENTIALS CONFIGURATION
        ======================================================== */
-    const SUPABASE_URL = "https://rjfvzvbpiepatngotlfm.supabase.co"; // Example: https://xyz.supabase.co
-    const SUPABASE_ANON_KEY = "sb_publishable_OSBZZ7-fUj7ubTmrYp3IVQ_-ctSFLmv"; // Your anon key
+    const SUPABASE_URL = "https://rjfvzvbpiepatngotlfm.supabase.co"; // Line 478: Paste Project URL
+    const SUPABASE_ANON_KEY = "sb_publishable_OSBZZ7-fUj7ubTmrYp3IVQ_-ctSFLmv"; // Line 479: Paste Anon Key
 
     let supabaseClient = null;
     if (SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" && window.supabase) {
@@ -610,7 +624,7 @@
     }
 
     /* ========================================================
-       3. CINEMATIC REALISTIC AVIAN FLIGHT SIMULATION
+       3. CINEMATIC REALISTIC AVIAN SIMULATION (TRANSPARENT OVER CLOUDS)
        ======================================================== */
     const canvas = document.getElementById('sky-canvas');
     const ctx = canvas.getContext('2d');
@@ -712,14 +726,8 @@
     const doves = [new RealisticDove(true), new RealisticDove(), new RealisticDove(), new RealisticDove(), new RealisticDove()];
 
     function renderSky() {
-      const grad = ctx.createLinearGradient(0, 0, 0, height);
-      grad.addColorStop(0, '#0c0407');
-      grad.addColorStop(0.3, '#240813');
-      grad.addColorStop(0.65, '#421321');
-      grad.addColorStop(0.88, '#69261a');
-      grad.addColorStop(1, '#0a0407');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
+      // Clear canvas so background clouds from clouds.css stay completely visible
+      ctx.clearRect(0, 0, width, height);
 
       doves.forEach(d => {
         d.update();
@@ -731,7 +739,7 @@
     renderSky();
 
     /* ========================================================
-       4. 3D BOOKSHELF RENDERER
+       4. 3D BOOKSHELF ENGINE
        ======================================================== */
     const shelfStage = document.getElementById('shelfStage');
     const selectedBookMeta = document.getElementById('selectedBookMeta');
@@ -820,7 +828,7 @@
     });
 
     /* ========================================================
-       5. ARCHIVE COLLECTIONS GRID RENDERER
+       5. ARCHIVE COLLECTIONS GRID ENGINE
        ======================================================== */
     const archiveGrid = document.getElementById('archiveGrid');
 
@@ -947,7 +955,6 @@
     function openAdmin() {
       adminModal.classList.add('active');
       
-      // Check if user is already logged in with Supabase
       if (supabaseClient && supabaseClient.auth.getUser) {
         supabaseClient.auth.getUser().then(({ data }) => {
           if (data && data.user) {
@@ -970,7 +977,7 @@
 
     document.getElementById('closeAdminBtn').addEventListener('click', closeAdmin);
 
-    // Open Shortcut: Ctrl + Shift + A
+    // Shortcut: Ctrl + Shift + A
     window.addEventListener('keydown', (e) => {
       if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
@@ -978,7 +985,7 @@
       }
     });
 
-    // Open Shortcut: Triple Click Brand Logo
+    // Shortcut: Triple Click Brand Logo
     document.getElementById('brandLogo').addEventListener('click', () => {
       logoClicks++;
       if (logoClicks === 3) {
@@ -988,10 +995,9 @@
       setTimeout(() => { logoClicks = 0; }, 1200);
     });
 
-    // URL Hash shortcut
     if (window.location.hash === '#admin') openAdmin();
 
-    // Supabase Email & Password Login Authentication
+    // Supabase Email & Password Login
     document.getElementById('adminLoginBtn').addEventListener('click', async () => {
       const email = document.getElementById('adminEmailInput').value.trim();
       const password = document.getElementById('adminPasswordInput').value.trim();
@@ -1037,7 +1043,7 @@
       closeAdmin();
     });
 
-    // Handle Local Image Upload
+    // Local Image Upload Handler
     const filePickerBtn = document.getElementById('filePickerBtn');
     const coverFileInput = document.getElementById('coverFileInput');
     const fileUploadStatus = document.getElementById('fileUploadStatus');
@@ -1056,7 +1062,7 @@
       }
     });
 
-    // Post to Supabase Cloud Database
+    // Form Submit to Cloud Database
     document.getElementById('addBookForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitBookBtn');
@@ -1110,11 +1116,11 @@
       submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF`;
       closeAdmin();
 
-      // Refresh both shelf and archive grid immediately
+      // Instantly refresh 3D shelf and archive collections
       await loadBooks();
     });
 
-    // Initial Load
+    // Run Initial Load
     loadBooks();
   </script>
 </body>
