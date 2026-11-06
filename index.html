@@ -234,7 +234,7 @@
     <!-- 2. TRANSPARENT AVIAN SIMULATION CANVAS -->
     <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
 
-    <!-- 3. SUBTLE AMBIENT VIGNETTE (Keeps clouds completely clear and luminous) -->
+    <!-- 3. GRADIENT VIGNETTE -->
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0a0407] z-10 pointer-events-none"></div>
 
     <!-- Hero Content -->
@@ -748,7 +748,7 @@
     const doves = [new RealisticDove(true), new RealisticDove(), new RealisticDove(), new RealisticDove(), new RealisticDove()];
 
     function renderSky() {
-      // Clear canvas so WebGL shader clouds behind it stay completely luminous
+      // Clear canvas so WebGL clouds stay fully luminous
       ctx.clearRect(0, 0, width, height);
 
       doves.forEach(d => {
@@ -1158,9 +1158,7 @@
     const hero = document.getElementById('hero');
     if (!canvas || !hero) return;
 
-    // Supports WebGL2 natively on Chrome Windows with WebGL1 fallback
-    const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, depth: false }) || 
-               canvas.getContext('webgl', { antialias: false, alpha: false, depth: false }) ||
+    const gl = canvas.getContext('webgl', { antialias: false, alpha: false, depth: false }) ||
                canvas.getContext('experimental-webgl', { antialias: false, alpha: false, depth: false });
 
     if (!gl) return;
@@ -1252,7 +1250,7 @@
 
       float dusk = smoothstep(0.15, 1.0, uScroll) * uDusk;
       vec3 night = mix(vec3(0.23, 0.04, 0.04), vec3(0.45, 0.20, 0.15), (col.r + col.g) * 0.35);
-      col = mix(col, night * (0.5 + 0.5 * col), dusk);
+      col = mix(col, night * (vec3(0.5, 0.5, 0.5) + 0.5 * col), dusk);
 
       gl_FragColor = vec4(col, 1.0);
     }`;
