@@ -490,6 +490,29 @@
     </div>
   </div>
 
+  <!-- FOOTER DOCUMENTATION & POLICY MODAL -->
+  <div class="app-modal fixed inset-0 bg-black/90 backdrop-blur-xl z-[130] items-center justify-center p-4 sm:p-6" id="policyModal">
+    <div class="relative w-full max-w-2xl bg-[#170810] border border-[#e5b364]/40 rounded-lg p-6 sm:p-8 shadow-2xl max-h-[85vh] flex flex-col">
+      <button class="absolute top-4 right-4 text-stone-400 hover:text-white text-xl z-20" id="closePolicyBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="border-b border-[#e5b364]/20 pb-3 mb-4">
+        <span class="text-[10px] font-bold tracking-[2.5px] text-[#e5b364] uppercase block mb-1">YOUR'S E-BOOK DOCUMENTATION</span>
+        <h2 class="font-['Cinzel'] text-xl sm:text-2xl font-bold text-white tracking-wide uppercase" id="policyModalTitle">Documentation</h2>
+      </div>
+
+      <div class="flex-1 overflow-y-auto text-xs sm:text-sm text-stone-300 leading-relaxed space-y-4 pr-2" id="policyModalBody">
+      </div>
+      
+      <div class="pt-4 border-t border-white/10 flex justify-end mt-4">
+        <button class="px-6 py-2 bg-[#70202e] hover:bg-[#8a2638] text-white text-xs font-bold tracking-widest uppercase rounded transition" id="closePolicyBtn2">
+          CLOSE
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SINGLE-LINE FOOTER -->
   <footer class="bg-[#050204] border-t border-[#e5b364]/10 py-6 px-6 sm:px-12 mt-auto">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-3 text-[11px] sm:text-xs text-stone-400">
@@ -501,7 +524,6 @@
         <a href="#" class="hover:text-[#e5b364] transition">Disclaimer</a>
         <a href="#" class="hover:text-[#e5b364] transition">Copyright Policy</a>
         <a href="#" class="hover:text-[#e5b364] transition">DMCA / Copyright Removal</a>
-        <a href="#" class="hover:text-[#e5b364] transition">Sitemap</a>
       </div>
       <div class="tracking-wider uppercase text-stone-500 text-[10px] sm:text-xs">
         © 2026 YOUR'S E-BOOK. ALL RIGHTS RESERVED.
@@ -1112,6 +1134,108 @@
 
     // Run Initial Load
     loadBooks();
+
+    /* ========================================================
+       8. FOOTER DOCUMENTATION & POLICY MODAL ENGINE
+       ======================================================== */
+    const policyModal = document.getElementById('policyModal');
+    const policyModalTitle = document.getElementById('policyModalTitle');
+    const policyModalBody = document.getElementById('policyModalBody');
+
+    const policyDocs = {
+      'About Us': {
+        title: 'About YOUR\'S E-BOOK',
+        content: `
+          <p class="font-['Cormorant_Garamond'] text-lg italic text-[#e5b364] mb-2">"A World of Stories, Knowledge & Imagination"</p>
+          <p>YOUR'S E-BOOK is a modern digital reading platform crafted to provide readers with an intimate, physical library feeling right inside the browser. By combining innovative 3D interactive bookshelf physics, distraction-free reading modes, and volumetric aesthetic atmospheres, we bridge classic hardcover book culture with digital preservation.</p>
+          <p>Our library curates an eclectic collection spanning world classics, historical volumes, regional literature, and native script folios across Bangla, English, Hindi, and more.</p>
+          <p>Every volume in our archive is preserved with dedication to typography, narrative authenticity, and accessible digital literacy for book lovers everywhere.</p>
+        `
+      },
+      'Contact Us': {
+        title: 'Contact Us',
+        content: ''
+      },
+      'Privacy Policy': {
+        title: 'Privacy Policy',
+        content: `
+          <p>At YOUR'S E-BOOK, reader privacy is a fundamental standard. We respect your autonomy as a reader:</p>
+          <ul class="list-disc pl-5 space-y-1.5 mt-2">
+            <li><strong>Anonymous Reading:</strong> Readers do not need an account or registration to browse our shelves, inspect titles, or read full digital texts.</li>
+            <li><strong>Admin Authentication:</strong> Curator and admin write credentials are fully encrypted and securely authenticated through Supabase Auth.</li>
+            <li><strong>Data Protection:</strong> We do not sell, rent, monetize, or track your reading habits with third-party advertisers or commercial trackers.</li>
+            <li><strong>Local Cache:</strong> Browser local storage is solely utilized for client-side display preferences (such as custom font sizes).</li>
+          </ul>
+        `
+      },
+      'Terms and Conditions': {
+        title: 'Terms and Conditions',
+        content: `
+          <p>By entering and using YOUR'S E-BOOK, you agree to comply with the following basic principles:</p>
+          <ul class="list-disc pl-5 space-y-1.5 mt-2">
+            <li>All content provided on this digital shelf is offered for personal, educational, scholarly, and non-commercial cultural enjoyment.</li>
+            <li>Users agree not to disrupt platform performance, abuse cloud endpoints, execute denial-of-service attempts, or inject malicious payloads into curator forms.</li>
+            <li>All custom platform aesthetics, 3D bookshelf interactions, and site design architectures remain proprietary.</li>
+          </ul>
+        `
+      },
+      'Disclaimer': {
+        title: 'Disclaimer of Liability',
+        content: `
+          <p>The books, excerpts, previews, and artistic covers displayed across YOUR'S E-BOOK are presented in good faith for cultural literacy, education, commentary, and public reading engagement.</p>
+          <p class="mt-2">While we strive for continuous uptime and database reliability, this service is provided on an "as is" and "as available" basis without express warranties of any kind.</p>
+        `
+      },
+      'Copyright Policy': {
+        title: 'Copyright Policy',
+        content: `
+          <p>YOUR'S E-BOOK honors and upholds the intellectual property rights of writers, translators, graphic artists, and publishers globally.</p>
+          <p class="mt-2">Items presented on our digital shelf comprise public domain works, openly licensed literature, creative commons material, or community submissions attributed to their respective creators.</p>
+          <p class="mt-2">If you believe that any material available on our library infringes upon your copyright, please consult our DMCA / Copyright Removal section for expedited resolution.</p>
+        `
+      },
+      'DMCA / Copyright Removal': {
+        title: 'DMCA Takedown & Copyright Removal',
+        content: `
+          <p>If you are a copyright owner or authorized representative and believe content hosted on YOUR'S E-BOOK infringes upon your copyrighted work, please submit a formal takedown request containing:</p>
+          <ol class="list-decimal pl-5 space-y-1.5 mt-2">
+            <li>Identification of the copyrighted work claimed to have been infringed.</li>
+            <li>Exact title, author, or URL of the specific item on YOUR'S E-BOOK.</li>
+            <li>Your direct contact details (full legal name, email address, and phone number).</li>
+            <li>A statement affirming that the disputed use is not authorized by the copyright owner.</li>
+          </ol>
+        `
+      }
+    };
+
+    function openPolicyModal(docKey) {
+      const doc = policyDocs[docKey];
+      if (!doc) return;
+      policyModalTitle.textContent = doc.title;
+      policyModalBody.innerHTML = doc.content;
+      policyModal.classList.add('active');
+    }
+
+    function closePolicyModal() {
+      policyModal.classList.remove('active');
+    }
+
+    document.getElementById('closePolicyBtn').addEventListener('click', closePolicyModal);
+    document.getElementById('closePolicyBtn2').addEventListener('click', closePolicyModal);
+
+    policyModal.addEventListener('click', (e) => {
+      if (e.target === policyModal) closePolicyModal();
+    });
+
+    document.querySelectorAll('footer a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const textKey = link.textContent.trim();
+        if (policyDocs[textKey]) {
+          openPolicyModal(textKey);
+        }
+      });
+    });
   </script>
 
   <!-- WEBGL SHADER CLOUDS (hero background) -->
