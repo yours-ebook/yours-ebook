@@ -196,92 +196,6 @@
       opacity: 1;
       pointer-events: auto;
     }
-
-    /* ========================================================
-       RENAISSANCE OIL-PAINTING CLOUD FALLBACK ENGINE
-       ======================================================== */
-    .sky-world-fallback {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .sky-backdrop-fallback {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 38%, #4a8fc2 0%, #c97f48 45%, #7a2b22 75%, #18050e 100%);
-    }
-    .sunlight-core-fallback {
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 75vw;
-      height: 50vh;
-      background: radial-gradient(ellipse at center, rgba(250, 195, 100, 0.55) 0%, rgba(225, 120, 50, 0.3) 45%, rgba(0, 0, 0, 0) 75%);
-      filter: blur(45px);
-      mix-blend-mode: screen;
-    }
-    .cloud-cluster-fallback {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(28px);
-      will-change: transform;
-    }
-    .cloud-layer-back-fallback {
-      width: 140%;
-      height: 120%;
-      top: -10%;
-      left: -20%;
-      background: 
-        radial-gradient(circle at 20% 40%, rgba(210, 115, 50, 0.85) 0%, transparent 45%),
-        radial-gradient(circle at 80% 35%, rgba(190, 85, 45, 0.8) 0%, transparent 50%),
-        radial-gradient(circle at 50% 60%, rgba(135, 40, 50, 0.9) 0%, transparent 60%);
-      animation: slowDriftBack 45s ease-in-out infinite alternate;
-    }
-    .cloud-layer-mid-fallback {
-      position: absolute;
-      inset: -15%;
-      background: 
-        radial-gradient(ellipse at 18% 25%, rgba(255, 215, 140, 0.9) 0%, rgba(215, 115, 55, 0.65) 30%, transparent 55%),
-        radial-gradient(ellipse at 82% 30%, rgba(250, 195, 120, 0.85) 0%, rgba(195, 90, 45, 0.6) 32%, transparent 55%),
-        radial-gradient(circle at 35% 70%, rgba(155, 48, 58, 0.88) 0%, transparent 45%),
-        radial-gradient(circle at 75% 75%, rgba(110, 30, 48, 0.92) 0%, transparent 50%);
-      filter: blur(22px);
-      animation: driftMid 32s ease-in-out infinite alternate;
-      mix-blend-mode: hard-light;
-    }
-    .cloud-layer-front-fallback {
-      position: absolute;
-      width: 130%;
-      height: 100%;
-      bottom: -20%;
-      left: -15%;
-      background: 
-        radial-gradient(ellipse at 25% 60%, rgba(235, 150, 90, 0.75) 0%, rgba(125, 35, 45, 0.85) 40%, transparent 65%),
-        radial-gradient(ellipse at 75% 65%, rgba(245, 170, 105, 0.75) 0%, rgba(140, 40, 52, 0.9) 42%, transparent 65%),
-        radial-gradient(ellipse at 50% 85%, rgba(45, 12, 22, 0.95) 0%, rgba(18, 5, 10, 1) 60%);
-      filter: blur(25px);
-      animation: driftFront 26s ease-in-out infinite alternate;
-    }
-    @keyframes slowDriftBack {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
-      50% { transform: translate3d(25px, -15px, 0) scale(1.04); }
-      100% { transform: translate3d(-20px, 10px, 0) scale(0.98); }
-    }
-    @keyframes driftMid {
-      0% { transform: translate3d(0, 0, 0) scale(1); }
-      50% { transform: translate3d(-35px, 20px, 0) scale(1.06); }
-      100% { transform: translate3d(30px, -15px, 0) scale(0.96); }
-    }
-    @keyframes driftFront {
-      0% { transform: translate3d(0, 0, 0); }
-      50% { transform: translate3d(30px, -10px, 0) scale(1.03); }
-      100% { transform: translate3d(-25px, 15px, 0) scale(1); }
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -314,21 +228,14 @@
   <!-- CINEMATIC HERO SECTION WITH REALISTIC CLOUDS & BIRDS -->
   <section class="relative w-full h-screen min-h-[640px] flex items-center justify-center text-center overflow-hidden px-4" id="hero">
     
-    <!-- 1. REALISTIC CSS DRIFTING CLOUDS (ALWAYS ACTIVE FALLBACK) -->
-    <div class="sky-world-fallback" id="cssClouds">
-      <div class="sky-backdrop-fallback"></div>
-      <div class="sunlight-core-fallback"></div>
-      <div class="cloud-cluster-fallback cloud-layer-back-fallback"></div>
-      <div class="cloud-cluster-fallback cloud-layer-mid-fallback"></div>
-      <div class="cloud-cluster-fallback cloud-layer-front-fallback"></div>
-    </div>
+    <!-- 1. PROCEDURAL CLOUD CANVAS (WEBGL SHADER / HIGH-RES 2D PARALLAX) -->
+    <canvas id="cloud-gl" class="absolute inset-0 w-full h-full z-0 block pointer-events-none" aria-hidden="true"></canvas>
 
-    <!-- 2. WEBGL SHADER CLOUD CANVAS (RUNS WHEN WEBGL IS AVAILABLE) -->
-    <canvas id="cloud-gl" class="absolute inset-0 w-full h-full z-[1] block pointer-events-none" aria-hidden="true"></canvas>
-
-    <!-- 3. TRANSPARENT FLYING DOVES CANVAS -->
+    <!-- 2. TRANSPARENT FLYING DOVES CANVAS -->
     <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
-    <div class="absolute inset-0 bg-radial-at-center from-[#260a15]/10 via-[#0a0407]/45 to-[#0a0407] z-10 pointer-events-none"></div>
+    
+    <!-- Hero Vignette Overlay -->
+    <div class="absolute inset-0 bg-radial-at-center from-transparent via-[#0a0407]/30 to-[#0a0407] z-10 pointer-events-none"></div>
 
     <!-- Hero Content -->
     <div class="relative z-20 max-w-4xl px-4 mt-12 animate-fade-in">
@@ -1239,186 +1146,260 @@
     loadBooks();
   </script>
 
-  <!-- WEBGL SHADER CLOUDS (WITH STRICT GLSL ES 1.00 & SEAMLESS CSS FALLBACK) -->
+  <!-- BULLETPROOF RENAISSANCE PROCEDURAL CLOUD SKY (WEBGL SHADER + 2D VOLUMETRIC FALLBACK) -->
   <script>
   (function () {
     const canvas = document.getElementById('cloud-gl');
     const hero = document.getElementById('hero');
-    const cssClouds = document.getElementById('cssClouds');
     if (!canvas || !hero) return;
 
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: false }) || 
-               canvas.getContext('experimental-webgl', { antialias: false, alpha: false });
-
-    // WebGL available na thakle CSS clouds on thakbe ebong safe exit korbe
-    if (!gl) {
-      console.warn("WebGL not available. Active fallback: Renaissance CSS Volumetric Clouds.");
-      return; 
+    let gl = null;
+    try {
+      gl = canvas.getContext('webgl', { antialias: false, alpha: false, depth: false }) || 
+           canvas.getContext('experimental-webgl', { antialias: false, alpha: false, depth: false });
+    } catch (e) {
+      gl = null;
     }
 
-    const QUALITY = 0.65;
-    const DUSK = 0.7;
+    /* -------------------------------------------------------------
+       MODE A: 100% DIRECTX ANGLE COMPLIANT WEBGL SHADER
+       ------------------------------------------------------------- */
+    if (gl) {
+      const QUALITY = 0.65;
+      const DUSK = 0.7;
 
-    const vert = 'attribute vec2 a; void main(){ gl_Position = vec4(a,0.0,1.0); }';
+      const vert = 'attribute vec2 a; void main(){ gl_Position = vec4(a, 0.0, 1.0); }';
 
-    const frag = `
-    #ifdef GL_FRAGMENT_PRECISION_HIGH
-    precision highp float;
-    #else
-    precision mediump float;
-    #endif
+      const frag = `
+      precision mediump float;
 
-    uniform vec2  uRes;
-    uniform float uTime;
-    uniform float uScroll;
-    uniform float uDusk;
-    uniform vec2  uMouse;
+      uniform vec2  uRes;
+      uniform float uTime;
+      uniform float uScroll;
+      uniform float uDusk;
+      uniform vec2  uMouse;
 
-    // Strict 100% GLSL ES 1.0 compatible vector operations
-    float hash(vec2 p){ 
-      p = fract(p * vec2(123.34, 456.21)); 
-      float d = dot(p, p + vec2(45.32, 45.32));
-      p += vec2(d, d); 
-      return fract(p.x * p.y); 
-    }
-
-    float vnoise(vec2 p){
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      f = f * f * (vec2(3.0, 3.0) - vec2(2.0, 2.0) * f);
-      return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-                 mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-    }
-
-    float fbm(vec2 p){
-      float v = 0.0;
-      float a = 0.5;
-      mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-      for(int i = 0; i < 6; i++){ 
-        v += a * vnoise(p); 
-        p = m * p; 
-        a *= 0.5; 
+      // Strict vector arithmetic for hash
+      float hash(vec2 p){ 
+        p = fract(p * vec2(123.34, 456.21)); 
+        float d = dot(p, p + vec2(45.32, 45.32));
+        p += vec2(d, d); 
+        return fract(p.x * p.y); 
       }
-      return v;
-    }
 
-    vec4 cloudLayer(vec2 uv, float scale, float drift, float parallax, float cover, float soft){
-      vec2 p = uv * scale + vec2(uTime * drift, 0.0) - vec2(0.0, uScroll * parallax) + uMouse * parallax * 0.05;
-      float d  = fbm(p);
-      float al = smoothstep(cover, cover + soft, d);
-      float l2 = fbm(p + vec2(-0.10, 0.12));
-      float lt = clamp((d - l2) * 6.5 + 0.5, 0.0, 1.0);
-
-      vec3 cShade = vec3(0.30, 0.17, 0.20);
-      vec3 cMid   = vec3(0.86, 0.58, 0.36);
-      vec3 cLight = vec3(1.00, 0.90, 0.68);
-
-      vec3 col = mix(cShade, cMid, smoothstep(0.0, 0.55, lt));
-      col = mix(col, cLight, smoothstep(0.55, 1.0, lt));
-      return vec4(col, al);
-    }
-
-    void main(){
-      vec2 uv  = gl_FragCoord.xy / uRes.y;
-      vec2 nuv = gl_FragCoord.xy / uRes;
-
-      vec3 skyBlue = vec3(0.27, 0.52, 0.78);
-      vec3 skyGold = vec3(0.98, 0.72, 0.22);
-      float glow = exp(-pow(length((nuv - vec2(0.45, 0.62)) * vec2(1.2, 1.0)), 2.0) * 3.2);
-      vec3 col = mix(skyBlue, skyGold, clamp(glow + (1.0 - nuv.y) * 0.25, 0.0, 1.0));
-
-      vec4 cFar = cloudLayer(uv + vec2(3.0, 0.0), 1.6, 0.010, 0.25, 0.46, 0.22);
-      cFar.a *= 0.55 * smoothstep(0.1, 0.9, nuv.y);
-      col = mix(col, cFar.rgb, cFar.a);
-
-      vec4 cMid = cloudLayer(uv + vec2(9.0, 2.0), 2.3, 0.020, 0.60, 0.44, 0.15);
-      cMid.a *= 0.9 * (smoothstep(0.85, 0.15, nuv.y) * 0.8 + 0.25 * smoothstep(0.6, 1.0, nuv.y));
-      col = mix(col, cMid.rgb, cMid.a);
-
-      vec4 cNear = cloudLayer(uv + vec2(17.0, 5.0), 3.2, 0.035, 1.20, 0.43, 0.13);
-      cNear.a *= smoothstep(0.55, 0.0, nuv.y) + 0.9 * smoothstep(0.70, 1.0, nuv.x) * smoothstep(0.3, 0.8, nuv.y);
-      col = mix(col, cNear.rgb, clamp(cNear.a, 0.0, 1.0));
-
-      col *= 1.0 - 0.35 * pow(length(nuv - vec2(0.5, 0.5)) * 1.25, 2.0);
-
-      float dusk = smoothstep(0.15, 1.0, uScroll) * uDusk;
-      vec3 night = mix(vec3(0.23, 0.04, 0.04), vec3(0.45, 0.20, 0.15), (col.r + col.g) * 0.35);
-      col = mix(col, night * (0.5 + 0.5 * col), dusk);
-
-      gl_FragColor = vec4(col, 1.0);
-    }`;
-
-    function compile(type, src){
-      const sh = gl.createShader(type);
-      gl.shaderSource(sh, src); 
-      gl.compileShader(sh);
-      if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
-        console.error('Cloud shader compile error:', gl.getShaderInfoLog(sh));
+      float vnoise(vec2 p){
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        vec2 u = f * f * (vec2(3.0, 3.0) - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+                   mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
       }
-      return sh;
+
+      float fbm(vec2 p){
+        float v = 0.0;
+        float a = 0.5;
+        mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
+        for(int i = 0; i < 5; i++){ 
+          v += a * vnoise(p); 
+          p = m * p; 
+          a *= 0.5; 
+        }
+        return v;
+      }
+
+      vec4 cloudLayer(vec2 uv, float scale, float drift, float parallax, float cover, float soft){
+        vec2 p = uv * scale + vec2(uTime * drift, 0.0) - vec2(0.0, uScroll * parallax) + uMouse * parallax * 0.05;
+        float d  = fbm(p);
+        float al = smoothstep(cover, cover + soft, d);
+        float l2 = fbm(p + vec2(-0.10, 0.12));
+        float lt = clamp((d - l2) * 6.5 + 0.5, 0.0, 1.0);
+
+        vec3 cShade = vec3(0.30, 0.17, 0.20);
+        vec3 cMid   = vec3(0.86, 0.58, 0.36);
+        vec3 cLight = vec3(1.00, 0.90, 0.68);
+
+        vec3 col = mix(cShade, cMid, smoothstep(0.0, 0.55, lt));
+        col = mix(col, cLight, smoothstep(0.55, 1.0, lt));
+        return vec4(col, al);
+      }
+
+      void main(){
+        vec2 uv  = gl_FragCoord.xy / uRes.y;
+        vec2 nuv = gl_FragCoord.xy / uRes;
+
+        vec3 skyBlue = vec3(0.27, 0.52, 0.78);
+        vec3 skyGold = vec3(0.98, 0.72, 0.22);
+        float glow = exp(-pow(length((nuv - vec2(0.45, 0.62)) * vec2(1.2, 1.0)), 2.0) * 3.2);
+        vec3 col = mix(skyBlue, skyGold, clamp(glow + (1.0 - nuv.y) * 0.25, 0.0, 1.0));
+
+        vec4 cFar = cloudLayer(uv + vec2(3.0, 0.0), 1.6, 0.010, 0.25, 0.46, 0.22);
+        cFar.a *= 0.55 * smoothstep(0.1, 0.9, nuv.y);
+        col = mix(col, cFar.rgb, cFar.a);
+
+        vec4 cMid = cloudLayer(uv + vec2(9.0, 2.0), 2.3, 0.020, 0.60, 0.44, 0.15);
+        float midAlpha = (1.0 - smoothstep(0.15, 0.85, nuv.y)) * 0.8 + 0.25 * smoothstep(0.6, 1.0, nuv.y);
+        cMid.a *= 0.9 * clamp(midAlpha, 0.0, 1.0);
+        col = mix(col, cMid.rgb, cMid.a);
+
+        vec4 cNear = cloudLayer(uv + vec2(17.0, 5.0), 3.2, 0.035, 1.20, 0.43, 0.13);
+        float nearAlpha = (1.0 - smoothstep(0.0, 0.55, nuv.y)) + 0.9 * smoothstep(0.70, 1.0, nuv.x) * smoothstep(0.3, 0.8, nuv.y);
+        cNear.a *= clamp(nearAlpha, 0.0, 1.0);
+        col = mix(col, cNear.rgb, clamp(cNear.a, 0.0, 1.0));
+
+        col *= 1.0 - 0.35 * pow(length(nuv - vec2(0.5, 0.5)) * 1.25, 2.0);
+
+        float dusk = smoothstep(0.15, 1.0, uScroll) * uDusk;
+        vec3 night = mix(vec3(0.23, 0.04, 0.04), vec3(0.45, 0.20, 0.15), (col.r + col.g) * 0.35);
+        col = mix(col, night * (0.5 + 0.5 * col), dusk);
+
+        gl_FragColor = vec4(col, 1.0);
+      }`;
+
+      function compile(type, src){
+        const sh = gl.createShader(type);
+        gl.shaderSource(sh, src);
+        gl.compileShader(sh);
+        if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
+          console.error(gl.getShaderInfoLog(sh));
+          return null;
+        }
+        return sh;
+      }
+
+      const vShader = compile(gl.VERTEX_SHADER, vert);
+      const fShader = compile(gl.FRAGMENT_SHADER, frag);
+
+      if (vShader && fShader) {
+        const prog = gl.createProgram();
+        gl.attachShader(prog, vShader);
+        gl.attachShader(prog, fShader);
+        gl.linkProgram(prog);
+
+        if (gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+          gl.useProgram(prog);
+
+          const buf = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+          const loc = gl.getAttribLocation(prog, 'a');
+          gl.enableVertexAttribArray(loc);
+          gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+          const U = n => gl.getUniformLocation(prog, n);
+          const uRes = U('uRes'), uTime = U('uTime'), uScroll = U('uScroll'), uMouse = U('uMouse');
+          gl.uniform1f(U('uDusk'), DUSK);
+
+          function resizeGL(){
+            const w = Math.max(1, Math.floor((hero.clientWidth || window.innerWidth) * QUALITY));
+            const h = Math.max(1, Math.floor((hero.clientHeight || window.innerHeight) * QUALITY));
+            canvas.width = w; 
+            canvas.height = h;
+            gl.viewport(0, 0, w, h);
+            gl.uniform2f(uRes, w, h);
+          }
+          window.addEventListener('resize', resizeGL);
+          resizeGL();
+
+          let scroll = 0, target = 0, mx = 0, my = 0, tx = 0, ty = 0, visible = true;
+          window.addEventListener('scroll', () => { target = window.scrollY / (hero.clientHeight || 1); }, { passive: true });
+          window.addEventListener('pointermove', e => { tx = e.clientX / window.innerWidth * 2 - 1; ty = -(e.clientY / window.innerHeight * 2 - 1); });
+          target = window.scrollY / (hero.clientHeight || 1);
+
+          if ('IntersectionObserver' in window) {
+            new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(hero);
+          }
+
+          const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          const t0 = performance.now();
+
+          function frameGL(now){
+            requestAnimationFrame(frameGL);
+            if (!visible) return;
+            scroll += (target - scroll) * 0.08;
+            mx += (tx - mx) * 0.05; 
+            my += (ty - my) * 0.05;
+            gl.uniform1f(uTime, still ? 0 : (now - t0) / 1000);
+            gl.uniform1f(uScroll, Math.min(scroll, 1.5));
+            gl.uniform2f(uMouse, mx, my);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+          }
+          requestAnimationFrame(frameGL);
+          return; // WebGL successfully launched!
+        }
+      }
     }
 
-    const prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vert));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, frag));
-    gl.linkProgram(prog);
+    /* -------------------------------------------------------------
+       MODE B: 2D PROCEDURAL VOLUMETRIC CANVAS CLOUDS (ZERO-FAIL)
+       Active if WebGL is disabled in user browser!
+       ------------------------------------------------------------- */
+    const ctx2d = canvas.getContext('2d');
+    if (!ctx2d) return;
 
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      console.warn("Shader linking failed. Keeping CSS clouds active.");
-      return;
+    let cw = canvas.width = window.innerWidth;
+    let ch = canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => {
+      cw = canvas.width = window.innerWidth;
+      ch = canvas.height = window.innerHeight;
+    });
+
+    const cloudPuffs = [];
+    for (let i = 0; i < 26; i++) {
+      cloudPuffs.push({
+        x: Math.random() * cw * 1.5 - cw * 0.25,
+        y: ch * 0.15 + Math.random() * (ch * 0.65),
+        rx: 160 + Math.random() * 220,
+        ry: 80 + Math.random() * 110,
+        speed: 0.2 + Math.random() * 0.45,
+        colorType: Math.random() > 0.5 ? 'gold' : 'amber'
+      });
     }
 
-    gl.useProgram(prog);
+    function render2DClouds() {
+      // Atmospheric sky gradient
+      const skyGrad = ctx2d.createLinearGradient(0, 0, 0, ch);
+      skyGrad.addColorStop(0, '#366d9c');
+      skyGrad.addColorStop(0.45, '#d48a47');
+      skyGrad.addColorStop(0.78, '#631f2b');
+      skyGrad.addColorStop(1, '#15060d');
+      ctx2d.fillStyle = skyGrad;
+      ctx2d.fillRect(0, 0, cw, ch);
 
-    // WebGL Shader সফলভাবে চালু হলে CSS মেঘ সরিয়ে দিয়ে GPU শ্যাডার ফুল অ্যাক্টিভ করা
-    if (cssClouds) cssClouds.style.display = 'none';
+      // Core Sunlight
+      const sun = ctx2d.createRadialGradient(cw * 0.48, ch * 0.42, 10, cw * 0.48, ch * 0.42, cw * 0.5);
+      sun.addColorStop(0, 'rgba(255, 225, 140, 0.65)');
+      sun.addColorStop(0.35, 'rgba(235, 140, 60, 0.35)');
+      sun.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx2d.fillStyle = sun;
+      ctx2d.fillRect(0, 0, cw, ch);
 
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, 'a');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      // Drifting Volumetric Cloud Puffs
+      cloudPuffs.forEach(p => {
+        p.x += p.speed;
+        if (p.x - p.rx > cw + 100) p.x = -p.rx * 2;
 
-    const U = n => gl.getUniformLocation(prog, n);
-    const uRes = U('uRes'), uTime = U('uTime'), uScroll = U('uScroll'), uMouse = U('uMouse');
-    gl.uniform1f(U('uDusk'), DUSK);
+        const radGrad = ctx2d.createRadialGradient(p.x, p.y, p.ry * 0.15, p.x, p.y, p.rx);
+        if (p.colorType === 'gold') {
+          radGrad.addColorStop(0, 'rgba(255, 230, 170, 0.42)');
+          radGrad.addColorStop(0.5, 'rgba(215, 130, 65, 0.25)');
+          radGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        } else {
+          radGrad.addColorStop(0, 'rgba(230, 145, 85, 0.38)');
+          radGrad.addColorStop(0.55, 'rgba(125, 38, 48, 0.22)');
+          radGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        }
 
-    function resize(){
-      const w = Math.max(1, Math.floor((hero.clientWidth || window.innerWidth) * QUALITY));
-      const h = Math.max(1, Math.floor((hero.clientHeight || window.innerHeight) * QUALITY));
-      canvas.width = w; 
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-      gl.uniform2f(uRes, w, h);
+        ctx2d.save();
+        ctx2d.beginPath();
+        ctx2d.ellipse(p.x, p.y, p.rx, p.ry, 0, 0, Math.PI * 2);
+        ctx2d.fillStyle = radGrad;
+        ctx2d.fill();
+        ctx2d.restore();
+      });
+
+      requestAnimationFrame(render2DClouds);
     }
-    window.addEventListener('resize', resize);
-    resize();
-
-    let scroll = 0, target = 0, mx = 0, my = 0, tx = 0, ty = 0, visible = true;
-    window.addEventListener('scroll', () => { target = window.scrollY / (hero.clientHeight || 1); }, { passive: true });
-    window.addEventListener('pointermove', e => { tx = e.clientX / window.innerWidth * 2 - 1; ty = -(e.clientY / window.innerHeight * 2 - 1); });
-    target = window.scrollY / (hero.clientHeight || 1);
-
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(hero);
-    }
-
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const t0 = performance.now();
-
-    function frame(now){
-      requestAnimationFrame(frame);
-      if (!visible) return;
-      scroll += (target - scroll) * 0.08;
-      mx += (tx - mx) * 0.05; 
-      my += (ty - my) * 0.05;
-      gl.uniform1f(uTime, still ? 0 : (now - t0) / 1000);
-      gl.uniform1f(uScroll, Math.min(scroll, 1.5));
-      gl.uniform2f(uMouse, mx, my);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    }
-    requestAnimationFrame(frame);
+    render2DClouds();
   })();
   </script>
 
