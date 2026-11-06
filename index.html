@@ -187,9 +187,9 @@
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- HEADER WITH PERFECTLY CENTERED FLOATING PILL NAVIGATION -->
+  <!-- HEADER -->
   <header class="fixed top-0 left-0 w-full h-[76px] px-6 sm:px-12 flex items-center justify-between bg-[#0a0407]/85 backdrop-blur-md border-b border-[#e5b364]/15 z-50">
-    <!-- Brand Logo -->
+    <!-- Brand Logo (Triple-click for Curator Portal) -->
     <div class="flex items-center gap-3 cursor-pointer select-none" id="brandLogo" title="Triple-click for Curator Portal">
       <i class="fa-solid fa-book-atlas text-xl text-[#e5b364] drop-shadow-[0_0_10px_rgba(229,179,100,0.4)]"></i>
       <span class="font-['Cinzel'] text-lg sm:text-xl font-bold tracking-[3px] text-white uppercase">YOUR'S E-BOOK</span>
@@ -206,7 +206,7 @@
       <a href="#archiveSection" class="text-xs font-semibold tracking-[2px] text-[#cfbebe] hover:text-[#e5b364] transition">STORY</a>
     </div>
 
-    <!-- Right Search Action -->
+    <!-- Search Action -->
     <div class="flex items-center gap-4">
       <button class="w-10 h-10 rounded-full border border-[#e5b364]/20 flex items-center justify-center text-[#e5b364] hover:bg-[#e5b364]/10 transition" id="searchTrigger" title="Search Books">
         <i class="fa-solid fa-magnifying-glass text-sm"></i>
@@ -214,7 +214,7 @@
     </div>
   </header>
 
-  <!-- CINEMATIC HERO SECTION (REALISTIC AVIAN FLIGHT SIMULATION) -->
+  <!-- CINEMATIC HERO SECTION -->
   <section class="relative w-full h-screen min-h-[640px] flex items-center justify-center text-center overflow-hidden px-4" id="hero">
     <canvas id="sky-canvas" class="absolute inset-0 w-full h-full z-0"></canvas>
     <div class="absolute inset-0 bg-radial-at-center from-[#260a15]/20 via-[#0a0407]/70 to-[#0a0407] z-10 pointer-events-none"></div>
@@ -241,14 +241,14 @@
     </div>
   </section>
 
-  <!-- 1. 3D BOOKSHELF SECTION (DIRECTLY BELOW HERO) -->
+  <!-- 1. 3D BOOKSHELF SECTION -->
   <section class="relative py-20 px-4 sm:px-8 bg-gradient-to-b from-[#0a0407] via-[#15060d] to-[#0a0407] flex flex-col items-center border-t border-[#e5b364]/10" id="shelfSection">
     <div class="text-center mb-8">
       <span class="font-['Cormorant_Garamond'] text-lg text-[#e5b364] tracking-[3px] uppercase block mb-1">Physical 3D Shelf</span>
       <h2 class="font-['Cinzel'] text-3xl sm:text-4xl text-white tracking-[4px] uppercase">Grand Library Shelf</h2>
     </div>
 
-    <!-- Language & Category Filters -->
+    <!-- Language Filter Pills -->
     <div class="w-full max-w-5xl mb-10 flex flex-col items-center gap-3">
       <div class="flex flex-wrap justify-center gap-2" id="shelfLangFilters">
         <button class="pill-btn active px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider border border-[#e5b364] bg-[#e5b364]/20 text-[#e5b364] transition" data-lang="all">All Languages</button>
@@ -259,7 +259,7 @@
       </div>
     </div>
 
-    <!-- 3D Shelf Stage -->
+    <!-- 3D Shelf Container -->
     <div class="shelf-container relative w-full max-w-6xl h-[470px] flex flex-col justify-end items-center mb-6">
       <button class="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#1b0a11]/90 border border-[#e5b364]/30 text-[#e5b364] flex items-center justify-center hover:bg-[#e5b364] hover:text-black transition z-30" id="shelfPrev">
         <i class="fa-solid fa-chevron-left"></i>
@@ -268,10 +268,7 @@
         <i class="fa-solid fa-chevron-right"></i>
       </button>
 
-      <div class="shelf-stage w-full h-[380px] flex items-end justify-center gap-4 pb-6 overflow-x-auto overflow-y-visible" id="shelfStage">
-        <!-- Rendered dynamically from Supabase Database -->
-      </div>
-
+      <div class="shelf-stage w-full h-[380px] flex items-end justify-center gap-4 pb-6 overflow-x-auto overflow-y-visible" id="shelfStage"></div>
       <div class="wood-shelf relative w-full h-7 rounded-sm"></div>
     </div>
 
@@ -282,11 +279,9 @@
     </div>
   </section>
 
-  <!-- 2. ARCHIVE COLLECTIONS SECTION (BELOW 3D SHELF) -->
+  <!-- 2. ARCHIVE COLLECTIONS SECTION -->
   <section class="py-16 px-6 sm:px-12 bg-[#0d0509] border-t border-[#e5b364]/10" id="archiveSection">
-    <!-- Single-line Title and Filters -->
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-      <!-- Title on Single Line -->
       <div class="flex items-center gap-3 flex-wrap">
         <span class="text-[10px] sm:text-xs font-bold tracking-[2.5px] text-[#e5b364] uppercase px-3 py-1 bg-[#e5b364]/10 border border-[#e5b364]/20 rounded">
           CURATORIAL SELECTIONS
@@ -297,7 +292,6 @@
         </h2>
       </div>
 
-      <!-- Filter Tabs -->
       <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
         <button class="archive-pill active px-4 py-2 rounded bg-[#70202e] text-white text-xs font-semibold tracking-wider uppercase border border-[#a83447] flex items-center gap-2 shadow" data-tab="all">
           <i class="fa-solid fa-sparkles text-[10px]"></i> FEATURED VOLUMES
@@ -314,10 +308,7 @@
       </div>
     </div>
 
-    <!-- Archive Book Grid -->
-    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7" id="archiveGrid">
-      <!-- Injected dynamically from Supabase Database -->
-    </div>
+    <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7" id="archiveGrid"></div>
   </section>
 
   <!-- FULL-SCREEN BOOK DETAILS MODAL -->
@@ -327,12 +318,10 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <!-- Left Cover Pane -->
       <div class="bg-[#0b0407] p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-[#e5b364]/10">
         <img src="" alt="Book Cover" class="w-full max-w-[260px] h-[370px] object-cover rounded shadow-2xl border border-white/10" id="modalCoverImg">
       </div>
 
-      <!-- Right Metadata Pane -->
       <div class="p-8 flex flex-col justify-between">
         <div>
           <div class="flex items-center gap-2 mb-3">
@@ -342,7 +331,7 @@
 
           <h2 class="font-['Cinzel'] text-2xl sm:text-3xl font-bold text-white tracking-wide mb-1" id="modalTitle">Book Title</h2>
           <p class="font-['Cormorant_Garamond'] text-lg italic text-[#e5b364] mb-4" id="modalAuthor">by Author</p>
-          <p class="text-xs sm:text-sm text-stone-300 leading-relaxed mb-6 max-h-32 overflow-y-auto" id="modalDesc">Description text goes here...</p>
+          <p class="text-xs sm:text-sm text-stone-300 leading-relaxed mb-6 max-h-32 overflow-y-auto" id="modalDesc">Description...</p>
 
           <div class="grid grid-cols-2 gap-2 text-xs bg-black/40 p-3 rounded border border-white/5 mb-6">
             <div><span class="text-stone-500">Year:</span> <span class="text-white" id="modalYear">2026</span></div>
@@ -364,7 +353,7 @@
     </div>
   </div>
 
-  <!-- DISTRACTION-FREE DIGITAL READER -->
+  <!-- DIGITAL READER MODAL -->
   <div class="app-modal fixed inset-0 bg-[#120c0f] text-stone-200 z-[110] flex-col" id="readerModal">
     <div class="h-14 bg-[#0a0508] border-b border-white/10 px-6 flex items-center justify-between">
       <div class="font-['Cinzel'] text-sm tracking-wider text-[#e5b364]" id="readerTitle">Reading Title</div>
@@ -376,30 +365,45 @@
         </button>
       </div>
     </div>
-    <div class="flex-1 max-w-3xl w-full mx-auto p-8 overflow-y-auto font-['Cormorant_Garamond'] text-2xl leading-relaxed" id="readerBody">
-      <!-- Full Reading Content -->
-    </div>
+    <div class="flex-1 max-w-3xl w-full mx-auto p-8 overflow-y-auto font-['Cormorant_Garamond'] text-2xl leading-relaxed" id="readerBody"></div>
   </div>
 
-  <!-- SECRET OWNER CURATOR PORTAL (POST BOOKS DIRECT TO SUPABASE) -->
+  <!-- SECRET OWNER PORTAL (SUPABASE AUTHENTICATED LOGIN) -->
   <div class="app-modal fixed inset-0 bg-black/90 backdrop-blur-xl z-[120] items-center justify-center p-4" id="adminModal">
     <div class="w-full max-w-xl bg-[#170810] border border-[#e5b364] rounded-lg p-7 shadow-2xl relative">
       <button class="absolute top-4 right-4 text-stone-400 hover:text-white" id="closeAdminBtn"><i class="fa-solid fa-xmark text-lg"></i></button>
 
-      <!-- PIN Lock Screen -->
+      <!-- Supabase Auth Login Screen (No PIN inside code) -->
       <div id="adminPinScreen">
         <h3 class="font-['Cinzel'] text-xl text-[#e5b364] tracking-widest text-center uppercase mb-1">CURATOR ACCESS</h3>
-        <p class="text-xs text-stone-400 text-center mb-6">Enter Secret Master PIN to manage Cloud Database</p>
-        <input type="password" id="adminPinInput" placeholder="Master PIN (Default: 2026)" class="w-full bg-black/50 border border-[#e5b364]/30 rounded p-3 text-white text-sm mb-4 outline-none focus:border-[#e5b364]">
-        <button class="w-full py-3 bg-[#e5b364] text-black font-bold text-xs tracking-widest uppercase rounded hover:bg-[#f4d08a]" id="adminLoginBtn">UNLOCK PORTAL</button>
+        <p class="text-xs text-stone-400 text-center mb-6">Enter Admin Credentials to unlock post management</p>
+        
+        <div class="space-y-3 mb-5">
+          <div>
+            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Admin Email</label>
+            <input type="email" id="adminEmailInput" placeholder="your-email@example.com" autocomplete="username" class="w-full bg-black/50 border border-[#e5b364]/30 rounded p-3 text-white text-xs outline-none focus:border-[#e5b364]">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Password</label>
+            <input type="password" id="adminPasswordInput" placeholder="Enter password" autocomplete="current-password" class="w-full bg-black/50 border border-[#e5b364]/30 rounded p-3 text-white text-xs outline-none focus:border-[#e5b364]">
+          </div>
+        </div>
+
+        <button class="w-full py-3 bg-[#e5b364] text-black font-bold text-xs tracking-widest uppercase rounded hover:bg-[#f4d08a] transition" id="adminLoginBtn">
+          UNLOCK PORTAL
+        </button>
       </div>
 
-      <!-- Cloud Upload Screen -->
+      <!-- Cloud Upload Screen (Accessible Only After Valid Login) -->
       <div id="adminPostScreen" class="hidden">
-        <h3 class="font-['Cinzel'] text-xl text-[#e5b364] tracking-widest text-center uppercase mb-1">PUBLISH TO CLOUD</h3>
-        <p class="text-xs text-stone-400 text-center mb-5">Books will instantly show on everyone's device via Supabase</p>
+        <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+          <h3 class="font-['Cinzel'] text-lg text-[#e5b364] tracking-wider uppercase">PUBLISH TO LIVE SHELF</h3>
+          <button id="adminLogoutBtn" class="text-[10px] text-red-400 hover:underline uppercase tracking-widest font-semibold">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i> Log Out
+          </button>
+        </div>
 
-        <form id="addBookForm" class="space-y-3.5 max-h-[70vh] overflow-y-auto pr-1">
+        <form id="addBookForm" class="space-y-3.5 max-h-[65vh] overflow-y-auto pr-1">
           <div>
             <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Book Title *</label>
             <input type="text" id="postTitle" required placeholder="e.g. পথের পাঁচালী / The Silent Horizon" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]">
@@ -454,7 +458,6 @@
             </div>
           </div>
 
-          <!-- Cover Image Upload or URL -->
           <div>
             <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Cover Art (Direct Upload or Link)</label>
             <input type="file" id="coverFileInput" accept="image/*" class="hidden">
@@ -462,11 +465,11 @@
               <i class="fa-solid fa-cloud-arrow-up text-[#e5b364] mb-1"></i>
               <div class="text-xs text-stone-300" id="fileUploadStatus">Click to select photo from your device</div>
             </div>
-            <input type="text" id="postCoverUrl" placeholder="Or paste image URL (ImgBB / Unsplash)" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white mt-2 outline-none focus:border-[#e5b364]">
+            <input type="text" id="postCoverUrl" placeholder="Or paste image URL directly" class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white mt-2 outline-none focus:border-[#e5b364]">
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Short Description / Synopsis</label>
+            <label class="block text-[11px] font-bold text-[#e5b364] tracking-wider uppercase mb-1">Short Description</label>
             <textarea id="postDesc" rows="2" placeholder="Brief book description..." class="w-full bg-black/40 border border-white/15 rounded p-2.5 text-xs text-white outline-none focus:border-[#e5b364]"></textarea>
           </div>
 
@@ -483,18 +486,18 @@
     </div>
   </div>
 
-  <!-- EXACT SINGLE-LINE FOOTER -->
+  <!-- SINGLE-LINE FOOTER -->
   <footer class="bg-[#050204] border-t border-[#e5b364]/10 py-6 px-6 sm:px-12 mt-auto">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-3 text-[11px] sm:text-xs text-stone-400">
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2">
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="about">About Us</a>
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="contact">Contact Us</a>
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="privacy">Privacy Policy</a>
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="terms">Terms and Conditions</a>
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="disclaimer">Disclaimer</a>
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="copyright">Copyright Policy</a>
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="dmca">DMCA / Copyright Removal</a>
-        <a href="#" class="hover:text-[#e5b364] transition legal-link" data-modal="sitemap">Sitemap</a>
+        <a href="#" class="hover:text-[#e5b364] transition">About Us</a>
+        <a href="#" class="hover:text-[#e5b364] transition">Contact Us</a>
+        <a href="#" class="hover:text-[#e5b364] transition">Privacy Policy</a>
+        <a href="#" class="hover:text-[#e5b364] transition">Terms and Conditions</a>
+        <a href="#" class="hover:text-[#e5b364] transition">Disclaimer</a>
+        <a href="#" class="hover:text-[#e5b364] transition">Copyright Policy</a>
+        <a href="#" class="hover:text-[#e5b364] transition">DMCA / Copyright Removal</a>
+        <a href="#" class="hover:text-[#e5b364] transition">Sitemap</a>
       </div>
       <div class="tracking-wider uppercase text-stone-500 text-[10px] sm:text-xs">
         © 2026 YOUR'S E-BOOK. ALL RIGHTS RESERVED.
@@ -502,22 +505,19 @@
     </div>
   </footer>
 
-  <!-- JAVASCRIPT & SUPABASE CLOUD LOGIC -->
+  <!-- JAVASCRIPT & SUPABASE AUTH ENGINE -->
   <script>
     /* ========================================================
-       1. SUPABASE CLOUD CONFIGURATION
-       Paste your credentials from Supabase Project Settings > API
+       1. SUPABASE CREDENTIALS CONFIGURATION
        ======================================================== */
     const SUPABASE_URL = "https://rjfvzvbpiepatngotlfm.supabase.co"; // Example: https://xyz.supabase.co
-    const SUPABASE_ANON_KEY = "sb_publishable_OSBZZ7-fUj7ubTmrYp3IVQ_-ctSFLmv"; // Your anon public key
-    const MASTER_PIN = "9096";
+    const SUPABASE_ANON_KEY = "sb_publishable_OSBZZ7-fUj7ubTmrYp3IVQ_-ctSFLmv"; // Your anon key
 
     let supabaseClient = null;
     if (SUPABASE_URL !== "YOUR_SUPABASE_PROJECT_URL" && window.supabase) {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-    // Default Seed Books (Used until cloud records exist)
     const initialSeedBooks = [
       {
         id: '1',
@@ -531,7 +531,7 @@
         spine_color: '#2b1b17',
         cover_image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80',
         description: 'Set against the fog-shrouded alleys of late 1960s London and Zurich, a reclusive cartographer stumbles upon an encoded atlas revealing secret covert pathways.',
-        content: 'Chapter 1: The Fog of London\n\nThe rain in Bloomsbury had turned the cobbles into black glass. Elias sat by the tallow flame, unrolling the calfskin parchment...'
+        content: 'Chapter 1: The Fog of London\n\nThe rain in Bloomsbury had turned the cobbles into black glass...'
       },
       {
         id: '2',
@@ -545,7 +545,7 @@
         spine_color: '#1a2930',
         cover_image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=700&q=80',
         description: 'A solitary lighthouse keeper and his young apprentice endure an unrelenting three-day gale that alters their perception of solitude and loyalty.',
-        content: 'Chapter 1: The Lantern Room\n\nThe Fresnel lens spun slowly on its mercury bath, casting radiant blades of light into the abyss of the North Atlantic...'
+        content: 'Chapter 1: The Lantern Room\n\nThe Fresnel lens spun slowly on its mercury bath...'
       },
       {
         id: '3',
@@ -559,7 +559,7 @@
         spine_color: '#3a131f',
         cover_image: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=700&q=80',
         description: 'একটি নদীর তীরে বেড়ে ওঠা তিন প্রজন্মের জীবন, ভালোবাসা ও বেদনার অনুপম মহাকাব্য। পদ্মা ও রূপসার পলির গন্ধ জড়িয়ে থাকা এক অমর উপাখ্যান।',
-        content: 'প্রথম পরিচ্ছেদ: নদীর গন্ধ\n\nভোরের কুয়াশা যখন রূপসার জলের ওপর আলতো চাদরের মতো বিছিয়ে থাকে, তখন মাঝিরা নৌকার গলুইয়ে বসে তামাকের ধোঁয়া ছাড়ে...'
+        content: 'প্রথম পরিচ্ছেদ: নদীর গন্ধ\n\nভোরের কুয়াশা যখন রূপসার জলের ওপর আলতো চাদরের মতো বিছিয়ে থাকে...'
       },
       {
         id: '4',
@@ -573,7 +573,7 @@
         spine_color: '#421f15',
         cover_image: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=700&q=80',
         description: 'प्राचीन भारत के गौरवशाली राजप्रासादों और संतों की दिव्य ज्ञान-परंपरा की ऐतिहासिक यात्रा, जो मनुष्य की असीम शक्ति को उजागर करती है।',
-        content: 'अध्याय १: सूर्योदय की बेला\n\nकाशी के घाटों पर गूँजते वेद मंत्रों के बीच एक संन्यासी ने अपनी यात्रा का अंतिम संकल्प लिया...'
+        content: 'अध्याय १: सूर्योदय की बेला\n\nकाशी के घाटों पर गूँजते वेद मंत्रों के बीच...'
       }
     ];
 
@@ -598,11 +598,9 @@
             currentBooks = initialSeedBooks;
           }
         } catch (err) {
-          console.warn("Using local seed:", err);
           currentBooks = initialSeedBooks;
         }
       } else {
-        // Fallback to local storage if Supabase credentials are not set yet
         const local = localStorage.getItem('yours_ebook_local_shelf');
         currentBooks = local ? JSON.parse(local) : initialSeedBooks;
       }
@@ -612,7 +610,7 @@
     }
 
     /* ========================================================
-       3. CINEMATIC REALISTIC BIRD CANVAS SIMULATION
+       3. CINEMATIC REALISTIC AVIAN FLIGHT SIMULATION
        ======================================================== */
     const canvas = document.getElementById('sky-canvas');
     const ctx = canvas.getContext('2d');
@@ -625,7 +623,6 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Realistic Dove Flight Physics Model
     class RealisticDove {
       constructor(isHero = false) {
         this.reset(isHero);
@@ -647,10 +644,10 @@
 
         if (this.glideCooldown <= 0) {
           this.wingBeat += this.wingFrequency;
-          if (Math.random() < 0.005) this.glideCooldown = 90; // Soar glide period
+          if (Math.random() < 0.005) this.glideCooldown = 90;
         } else {
           this.glideCooldown--;
-          this.wingBeat = Math.sin(this.wingBeat) * 0.2; // Flat wing glide
+          this.wingBeat = Math.sin(this.wingBeat) * 0.2;
         }
 
         if (this.x > width + 100) this.reset(this.isHero);
@@ -666,12 +663,10 @@
         ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
         ctx.shadowBlur = 10;
 
-        // Fuselage / Torso
         ctx.beginPath();
         ctx.ellipse(0, 0, 16, 6, -0.15, 0, Math.PI * 2);
         ctx.fill();
 
-        // Head and Beak
         ctx.beginPath();
         ctx.arc(14, -2, 4.5, 0, Math.PI * 2);
         ctx.fill();
@@ -682,7 +677,6 @@
         ctx.lineTo(17, 0);
         ctx.fill();
 
-        // Fanned Tail Feathers
         ctx.fillStyle = 'rgba(245, 240, 240, 0.88)';
         ctx.beginPath();
         ctx.moveTo(-12, 1);
@@ -691,7 +685,6 @@
         ctx.closePath();
         ctx.fill();
 
-        // Articulated Left Wing
         ctx.save();
         ctx.translate(2, -2);
         ctx.rotate(-wingAngle * 0.75);
@@ -702,7 +695,6 @@
         ctx.fill();
         ctx.restore();
 
-        // Articulated Right Wing
         ctx.save();
         ctx.translate(2, 2);
         ctx.rotate(wingAngle * 0.75);
@@ -720,7 +712,6 @@
     const doves = [new RealisticDove(true), new RealisticDove(), new RealisticDove(), new RealisticDove(), new RealisticDove()];
 
     function renderSky() {
-      // Burgundy & Amber Atmospheric Sky
       const grad = ctx.createLinearGradient(0, 0, 0, height);
       grad.addColorStop(0, '#0c0407');
       grad.addColorStop(0.3, '#240813');
@@ -740,20 +731,17 @@
     renderSky();
 
     /* ========================================================
-       4. 3D BOOKSHELF ENGINE (FIRST SECTION)
+       4. 3D BOOKSHELF RENDERER
        ======================================================== */
     const shelfStage = document.getElementById('shelfStage');
     const selectedBookMeta = document.getElementById('selectedBookMeta');
 
     function render3DShelf() {
       shelfStage.innerHTML = '';
-
-      const filtered = currentBooks.filter(b => {
-        return shelfLangFilter === 'all' || b.language.toLowerCase() === shelfLangFilter.toLowerCase();
-      });
+      const filtered = currentBooks.filter(b => shelfLangFilter === 'all' || b.language.toLowerCase() === shelfLangFilter.toLowerCase());
 
       if (filtered.length === 0) {
-        shelfStage.innerHTML = `<div class="text-stone-400 italic text-sm py-12">No books found in this language category.</div>`;
+        shelfStage.innerHTML = `<div class="text-stone-400 italic text-sm py-12">No books found in this category.</div>`;
         return;
       }
 
@@ -765,14 +753,12 @@
         const cover = book.cover_image || 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=700&q=80';
 
         item.innerHTML = `
-          <!-- Spine (Faces visitor) -->
           <div class="book-spine" style="background: ${book.spine_color || '#2b1b17'}">
             <span class="text-[10px] font-bold tracking-widest text-[#e5b364]">${book.language.substring(0,3).toUpperCase()}</span>
             <span class="spine-title">${book.title}</span>
             <span class="text-[9px] text-stone-400">${book.year || '2026'}</span>
           </div>
 
-          <!-- 3D Front Cover (Rotates 90 deg forward when clicked) -->
           <div class="book-front" style="background-image: url('${cover}')">
             <div class="book-front-overlay">
               <span class="text-[10px] font-bold text-[#e5b364] uppercase">${book.category}</span>
@@ -819,11 +805,9 @@
       }
     }
 
-    // Shelf Controls
     document.getElementById('shelfPrev').addEventListener('click', () => shelfStage.scrollBy({ left: -240, behavior: 'smooth' }));
     document.getElementById('shelfNext').addEventListener('click', () => shelfStage.scrollBy({ left: 240, behavior: 'smooth' }));
 
-    // Language Filter Buttons
     document.querySelectorAll('#shelfLangFilters .pill-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('#shelfLangFilters .pill-btn').forEach(b => {
@@ -836,7 +820,7 @@
     });
 
     /* ========================================================
-       5. ARCHIVE COLLECTIONS GRID ENGINE (SECOND SECTION)
+       5. ARCHIVE COLLECTIONS GRID RENDERER
        ======================================================== */
     const archiveGrid = document.getElementById('archiveGrid');
 
@@ -849,7 +833,6 @@
         card.className = 'bg-[#15070d] border border-white/10 rounded overflow-hidden flex flex-col hover:border-[#e5b364]/40 transition group';
 
         card.innerHTML = `
-          <!-- Card Image with Rating and Language Badge -->
           <div class="relative h-72 w-full overflow-hidden bg-black">
             <img src="${cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
             <div class="absolute top-3 right-3 bg-black/75 backdrop-blur-md px-2.5 py-1 rounded text-xs font-bold text-[#e5b364] border border-white/10">
@@ -860,7 +843,6 @@
             </div>
           </div>
 
-          <!-- Card Content -->
           <div class="p-5 flex-1 flex flex-col justify-between">
             <div>
               <div class="text-[11px] font-bold tracking-widest text-[#e5b364] uppercase mb-1">
@@ -876,7 +858,6 @@
               </p>
             </div>
 
-            <!-- Action Buttons -->
             <div class="flex items-center gap-3 pt-3 border-t border-white/5">
               <button class="details-trigger flex-1 py-2 text-xs font-semibold tracking-wider text-stone-300 hover:text-white uppercase transition text-left" data-id="${book.id}">
                 DETAILS ↗
@@ -891,7 +872,6 @@
         archiveGrid.appendChild(card);
       });
 
-      // Bind Details and Read buttons
       document.querySelectorAll('.details-trigger').forEach(btn => {
         btn.addEventListener('click', () => {
           const b = currentBooks.find(x => x.id === btn.dataset.id);
@@ -907,7 +887,7 @@
     }
 
     /* ========================================================
-       6. MODAL SYSTEM (DETAILS & READER)
+       6. FULL DETAILS & READER MODALS
        ======================================================== */
     const detailsModal = document.getElementById('detailsModal');
     let activeBook = null;
@@ -928,7 +908,6 @@
     document.getElementById('closeDetailsBtn').addEventListener('click', () => detailsModal.classList.remove('active'));
     document.getElementById('closeDetailsBtn2').addEventListener('click', () => detailsModal.classList.remove('active'));
 
-    // Digital Reader
     const readerModal = document.getElementById('readerModal');
     const readerBody = document.getElementById('readerBody');
     let readerFontSize = 24;
@@ -957,29 +936,49 @@
     });
 
     /* ========================================================
-       7. SECRET OWNER CURATOR PORTAL & CLOUD POST
+       7. CURATOR PORTAL & SUPABASE AUTH LOGIN
        ======================================================== */
     const adminModal = document.getElementById('adminModal');
     const adminPinScreen = document.getElementById('adminPinScreen');
     const adminPostScreen = document.getElementById('adminPostScreen');
-    const adminPinInput = document.getElementById('adminPinInput');
     let logoClicks = 0;
     let uploadedCoverBase64 = "";
 
     function openAdmin() {
       adminModal.classList.add('active');
-      adminPinScreen.classList.remove('hidden');
-      adminPostScreen.classList.add('hidden');
-      adminPinInput.value = '';
-      adminPinInput.focus();
+      
+      // Check if user is already logged in with Supabase
+      if (supabaseClient && supabaseClient.auth.getUser) {
+        supabaseClient.auth.getUser().then(({ data }) => {
+          if (data && data.user) {
+            adminPinScreen.classList.add('hidden');
+            adminPostScreen.classList.remove('hidden');
+          } else {
+            adminPinScreen.classList.remove('hidden');
+            adminPostScreen.classList.add('hidden');
+          }
+        });
+      } else {
+        adminPinScreen.classList.remove('hidden');
+        adminPostScreen.classList.add('hidden');
+      }
     }
+    
     function closeAdmin() {
       adminModal.classList.remove('active');
     }
 
     document.getElementById('closeAdminBtn').addEventListener('click', closeAdmin);
 
-    // Secret 1: Triple-Click Header Logo
+    // Open Shortcut: Ctrl + Shift + A
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        openAdmin();
+      }
+    });
+
+    // Open Shortcut: Triple Click Brand Logo
     document.getElementById('brandLogo').addEventListener('click', () => {
       logoClicks++;
       if (logoClicks === 3) {
@@ -989,28 +988,56 @@
       setTimeout(() => { logoClicks = 0; }, 1200);
     });
 
-    // Secret 2: Shortcut Ctrl + Shift + A
-    window.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        openAdmin();
-      }
-    });
-
-    // Secret 3: URL #admin
+    // URL Hash shortcut
     if (window.location.hash === '#admin') openAdmin();
 
-    // Verify PIN
-    document.getElementById('adminLoginBtn').addEventListener('click', () => {
-      if (adminPinInput.value === MASTER_PIN) {
-        adminPinScreen.classList.add('hidden');
-        adminPostScreen.classList.remove('hidden');
+    // Supabase Email & Password Login Authentication
+    document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('adminEmailInput').value.trim();
+      const password = document.getElementById('adminPasswordInput').value.trim();
+      const loginBtn = document.getElementById('adminLoginBtn');
+
+      if (!email || !password) {
+        alert("Please enter both Admin Email and Password.");
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.innerText = "AUTHENTICATING...";
+
+      if (supabaseClient) {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          alert("Access Denied: " + error.message);
+          loginBtn.disabled = false;
+          loginBtn.innerText = "UNLOCK PORTAL";
+        } else {
+          adminPinScreen.classList.add('hidden');
+          adminPostScreen.classList.remove('hidden');
+          document.getElementById('adminPasswordInput').value = '';
+          loginBtn.disabled = false;
+          loginBtn.innerText = "UNLOCK PORTAL";
+        }
       } else {
-        alert('Invalid PIN!');
+        alert("Please configure your SUPABASE_URL and SUPABASE_ANON_KEY first.");
+        loginBtn.disabled = false;
+        loginBtn.innerText = "UNLOCK PORTAL";
       }
     });
 
-    // Handle Local Image File Upload
+    // Admin Logout
+    document.getElementById('adminLogoutBtn').addEventListener('click', async () => {
+      if (supabaseClient) await supabaseClient.auth.signOut();
+      adminPostScreen.classList.add('hidden');
+      adminPinScreen.classList.remove('hidden');
+      closeAdmin();
+    });
+
+    // Handle Local Image Upload
     const filePickerBtn = document.getElementById('filePickerBtn');
     const coverFileInput = document.getElementById('coverFileInput');
     const fileUploadStatus = document.getElementById('fileUploadStatus');
@@ -1029,12 +1056,12 @@
       }
     });
 
-    // Post to Supabase Cloud Database Form
+    // Post to Supabase Cloud Database
     document.getElementById('addBookForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitBookBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> UPLOADING TO CLOUD...`;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> PUBLISHING TO CLOUD...`;
 
       const title = document.getElementById('postTitle').value.trim();
       const native_title = document.getElementById('postNativeTitle').value.trim();
@@ -1065,21 +1092,13 @@
       };
 
       if (supabaseClient) {
-        // Upload directly to Supabase table
         const { error } = await supabaseClient.from('books').insert([newRecord]);
         if (error) {
-          alert('Supabase Error: ' + error.message);
+          alert('Upload Failed: ' + error.message);
           submitBtn.disabled = false;
           submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF`;
           return;
         }
-      } else {
-        // Fallback to local storage
-        newRecord.id = 'local_' + Date.now();
-        const local = localStorage.getItem('yours_ebook_local_shelf');
-        const list = local ? JSON.parse(local) : [...initialSeedBooks];
-        list.unshift(newRecord);
-        localStorage.setItem('yours_ebook_local_shelf', JSON.stringify(list));
       }
 
       alert(`"${title}" published successfully to Cloud Database!`);
@@ -1091,11 +1110,11 @@
       submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> PUBLISH TO LIVE 3D SHELF`;
       closeAdmin();
 
-      // Refresh live books
+      // Refresh both shelf and archive grid immediately
       await loadBooks();
     });
 
-    // Initialize
+    // Initial Load
     loadBooks();
   </script>
 </body>
